@@ -63,7 +63,7 @@ export default function Home() {
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight">Executive Governance Dashboard</h1>
           <p className="text-slate-300 text-base leading-relaxed">
-            Real-time public oversight portal monitoring municipal budget execution, official wealth disclosures, and crowdsourced grievances directly from the online cloud database.
+            Real-time public oversight portal monitoring budget execution, official wealth disclosures, and crowdsourced grievances directly from the online cloud database.
           </p>
         </div>
       </div>
@@ -132,7 +132,7 @@ export default function Home() {
               </div>
               <ArrowRight size={18} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">Municipal Budget Expenditure</h3>
+            <h3 className="text-lg font-bold text-slate-900">Budget Expenditure</h3>
             <p className="text-sm text-slate-600">
               Interactive departmental expenditure breakdown, execution rate tracking, and audit flags.
             </p>
