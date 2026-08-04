@@ -18,7 +18,7 @@ import {
   Layers, 
   PieChart, 
   Building2,
-  ListFormatted,
+  ListOrdered,
   Loader2,
   FileSpreadsheet
 } from 'lucide-react';
@@ -253,7 +253,7 @@ export default function BudgetPage() {
             <div className="p-6 border-b border-slate-800 flex items-center justify-between sticky top-0 bg-slate-900/95 backdrop-blur z-10">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-blue-950/60 border border-blue-800/50 rounded-lg text-blue-400">
-                  <ListFormatted size={22} />
+                  <ListOrdered size={22} />
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-white">{selectedDept}</h2>
