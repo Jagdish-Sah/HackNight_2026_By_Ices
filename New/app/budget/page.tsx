@@ -1,28 +1,39 @@
 'use client';
 
-import { useState } from 'react';
-import { mockBudgetData } from '@/data/mockData';
+import { useState, useEffect } from 'react';
+import { getBudgetData, BudgetCategory } from '@/lib/actions';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts';
 import { Search, DollarSign, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
 
 export default function BudgetPage() {
+  const [data, setData] = useState<BudgetCategory[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const filteredData = mockBudgetData.filter((item) =>
+  useEffect(() => {
+    async function loadData() {
+      const result = await getBudgetData();
+      setData(result);
+      setLoading(false);
+    }
+    loadData();
+  }, []);
+
+  const filteredData = data.filter((item) =>
     item.department.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalAllocated = mockBudgetData.reduce((acc, curr) => acc + curr.allocated, 0);
-  const totalSpent = mockBudgetData.reduce((acc, curr) => acc + curr.spent, 0);
+  const totalAllocated = data.reduce((acc, curr) => acc + curr.allocated, 0);
+  const totalSpent = data.reduce((acc, curr) => acc + curr.spent, 0);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Municipal Budget Expenditure</h1>
-          <p className="text-slate-600">Real-time allocation vs actual utilization tracking across departments</p>
+          <p className="text-slate-600">Real-time allocation vs actual utilization tracking across departments (Powered by Neon PostgreSQL)</p>
         </div>
         <div className="relative w-full md:w-72">
           <Search className="absolute left-3 top-3 text-slate-400" size={18} />
@@ -61,7 +72,9 @@ export default function BudgetPage() {
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Execution Rate</p>
-            <p className="text-2xl font-bold text-slate-900">{((totalSpent / totalAllocated) * 100).toFixed(1)}%</p>
+            <p className="text-2xl font-bold text-slate-900">
+              {totalAllocated > 0 ? ((totalSpent / totalAllocated) * 100).toFixed(1) : 0}%
+            </p>
           </div>
           <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
             <AlertTriangle size={24} />
@@ -74,32 +87,40 @@ export default function BudgetPage() {
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
           <h2 className="text-lg font-bold text-slate-900 mb-4">Allocated vs Spent ($ Millions)</h2>
           <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={filteredData}>
-                <XAxis dataKey="department" tick={{ fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={60} />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="allocated" fill="#3b82f6" name="Allocated ($M)" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="spent" fill="#10b981" name="Spent ($M)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <div className="h-full flex items-center justify-center text-slate-400 text-sm">Loading Neon Database...</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={filteredData}>
+                  <XAxis dataKey="department" tick={{ fontSize: 11 }} interval={0} angle={-15} textAnchor="end" height={60} />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="allocated" fill="#3b82f6" name="Allocated ($M)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="spent" fill="#10b981" name="Spent ($M)" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm">
           <h2 className="text-lg font-bold text-slate-900 mb-4">Budget Share Distribution</h2>
           <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={mockBudgetData} dataKey="allocated" nameKey="department" cx="50%" cy="50%" outerRadius={80} label>
-                  {mockBudgetData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <div className="h-full flex items-center justify-center text-slate-400 text-sm">Loading Neon Database...</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={data} dataKey="allocated" nameKey="department" cx="50%" cy="50%" outerRadius={80} label>
+                    {data.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
@@ -119,7 +140,7 @@ export default function BudgetPage() {
           </thead>
           <tbody className="divide-y divide-slate-100 text-sm">
             {filteredData.map((item) => {
-              const utilRate = ((item.spent / item.allocated) * 100).toFixed(0);
+              const utilRate = item.allocated > 0 ? ((item.spent / item.allocated) * 100).toFixed(0) : '0';
               return (
                 <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                   <td className="py-3 px-4 font-medium text-slate-900">{item.department}</td>

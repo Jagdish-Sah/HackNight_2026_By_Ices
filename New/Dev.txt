@@ -30,3 +30,12 @@
 - Configured `scripts/seed.ts` for automated cloud table hydration directly from `data/mockData.ts`.
 - Refactored `lib/actions.ts` Server Actions (`getBudgetData`, `getPoliticianAssets`, `getPromisesData`, `getKYCRecords`, `getComplaintsData`, `upvoteComplaint`, `submitComplaint`, `getFAQData`) to query the hosted cloud database directly with instant fallback safeguards.
 
+[UPDATE 7 - NEON SERVERLESS POSTGRESQL CODE MIGRATION COMPLETE]
+- Installed `@neondatabase/serverless` driver for HTTP/WebSocket Neon database access.
+- Updated `.env.example` with standard Neon `DATABASE_URL` and `DIRECT_URL` configuration placeholders.
+- Built DDL and DML scripts for Neon SQL Console defining all 6 core tables (`budget_categories`, `politician_assets`, `key_assets`, `promise_items`, `kyc_records`, `complaint_items`, `faq_items`).
+- Updated `lib/db.ts` to export Neon serverless `sql` query helper.
+- Refactored `lib/actions.ts` Data Access Layer to execute direct SQL queries and live mutations (`upvoteComplaint`, `submitComplaint`, `createBudgetCategory`) against Neon.
+- Connected application pages (`app/budget/page.tsx`, `app/complaints/page.tsx`) to dynamically consume Server Actions from Neon with automatic dataset fallbacks.
+
+
