@@ -60,6 +60,7 @@ export interface FAQItem {
 export interface ExpenditureItem {
   task: string;
   amount: number;
+  expectedPrice?: number; // Added to track baseline market price and flag markups
   status: string;
 }
 
