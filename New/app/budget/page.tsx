@@ -35,9 +35,9 @@ interface ExpenditureItem {
 
 // Utility for professional financial formatting
 const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-NP', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'NPR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -176,7 +176,7 @@ export default function BudgetPage() {
               <span>Total Allocated</span>
               
             </div>
-            <div className="text-2xl font-bold text-white">{formatCurrency(totalAllocated)}</div>
+            <div className="text-2xl font-bold text-white">NPR {totalAllocated.toLocaleString('en-IN')}</div>
             <div className="text-xs text-slate-500 mt-1">Fiscal Year 2025/2026</div>
           </div>
 
@@ -185,7 +185,7 @@ export default function BudgetPage() {
               <span>Total Disbursed</span>
               <TrendingUp className="text-emerald-400" size={18} />
             </div>
-            <div className="text-2xl font-bold text-white">{formatCurrency(totalSpent)}</div>
+            <div className="text-2xl font-bold text-white">NPR {totalSpent.toLocaleString('en-IN')}</div>
             <div className="text-xs text-emerald-400 mt-1">{utilizationRate}% Utilization Rate</div>
           </div>
 
@@ -194,7 +194,7 @@ export default function BudgetPage() {
               <span>Remaining Funds</span>
               <CheckCircle2 className="text-indigo-400" size={18} />
             </div>
-            <div className="text-2xl font-bold text-white">{formatCurrency(totalAllocated - totalSpent)}</div>
+            <div className="text-2xl font-bold text-white">NPR {(totalAllocated - totalSpent).toLocaleString('en-IN')}</div>
             <div className="text-xs text-slate-500 mt-1">Available in Treasury</div>
           </div>
 
@@ -262,8 +262,8 @@ export default function BudgetPage() {
                           <Building2 className="text-slate-500 group-hover:text-blue-400 transition-colors" size={18} />
                           {b.department}
                         </td>
-                        <td className="py-4 px-6 font-mono text-slate-300">{formatCurrency(b.allocated)}</td>
-                        <td className="py-4 px-6 font-mono text-slate-300">{formatCurrency(b.spent)}</td>
+                        <td className="py-4 px-6 font-mono text-slate-300">{(b.allocated)}</td>
+                        <td className="py-4 px-6 font-mono text-slate-300">{(b.spent)}</td>
                         <td className="py-4 px-6 w-48">
                           <div className="flex items-center gap-3">
                             <div className="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800" role="progressbar" aria-valuenow={percentage} aria-valuemin={0} aria-valuemax={100}>
