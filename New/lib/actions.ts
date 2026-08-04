@@ -57,6 +57,12 @@ export interface FAQItem {
   answer: string;
 }
 
+export interface ExpenditureItem {
+  task: string;
+  amount: number;
+  status: string;
+}
+
 export interface SubDepartmentData {
   id: string;
   departmentName: string;
@@ -64,223 +70,7 @@ export interface SubDepartmentData {
   allocated: number;
   spent: number;
   status: string;
-}
-
-const defaultBudgetData = [
-  { id: 'b-1', department: 'Roads & Infrastructure', allocated: 450, spent: 390, status: 'On Track' },
-  { id: 'b-2', department: 'Public Health Services', allocated: 280, spent: 120, status: 'Underutilized' },
-  { id: 'b-3', department: 'Education & Schools', allocated: 310, spent: 305, status: 'On Track' },
-  { id: 'b-4', department: 'Sanitation & Waste Management', allocated: 150, spent: 185, status: 'Overbudget' },
-  { id: 'b-5', department: 'Digital Governance & IT', allocated: 90, spent: 25, status: 'Audited Flag' },
-  { id: 'b-6', department: 'Water Resources & Sewage', allocated: 220, spent: 210, status: 'On Track' },
-];
-
-const defaultSubDepartmentData = [
-  { id: 'sub-edu-1', departmentName: 'Education & Schools', entityName: 'Western Regional Campus (WRC) Infrastructure', allocated: 110, spent: 108, status: 'On Track' },
-  { id: 'sub-edu-2', departmentName: 'Education & Schools', entityName: 'Eastern Regional Campus (ERC) Research Lab', allocated: 90, spent: 88, status: 'On Track' },
-  { id: 'sub-hlth-1', departmentName: 'Public Health Services', entityName: 'Pokhara Academy of Health Sciences (PAHS)', allocated: 120, spent: 50, status: 'Underutilized' },
-  { id: 'sub-wat-1', departmentName: 'Water Resources & Sewage', entityName: 'Mardi Khola Water Treatment Facility', allocated: 100, spent: 98, status: 'On Track' },
-  { id: 'sub-rd-1', departmentName: 'Roads & Infrastructure', entityName: 'Pokhara Metropolitan Ring Road Expansion', allocated: 90, spent: 45, status: 'On Track' },
-  { id: 'sub-san-1', departmentName: 'Sanitation & Waste Management', entityName: 'Landfill Site Waste Processing Plant', allocated: 80, spent: 100, status: 'Overbudget' },
-  { id: 'sub-it-1', departmentName: 'Digital Governance & IT', entityName: 'Central Data Center & KYC Hub Deployment', allocated: 40, spent: 10, status: 'Audited Flag' }
-];
-
-const defaultPoliticianData = [
-  { id: 'p-1', name: 'Rajesh Sharma', role: 'Minister of Physical Infrastructure', declaredAssets: 45.2, year2022Assets: 12.0, year2026Assets: 45.2, flaggedAnomalies: true, keyAssets: ['3 Land Plots in Ward 4', 'Commercial Complex', 'Foreign Currency Deposits'] },
-  { id: 'p-2', name: 'Sita Adhikari', role: 'Mayor - Pokhara Metropolitan', declaredAssets: 18.5, year2022Assets: 14.2, year2026Assets: 18.5, flaggedAnomalies: false, keyAssets: ['Residential House', 'Agricultural Land', 'Fixed Bank Deposits'] },
-  { id: 'p-3', name: 'Bikram Thapa', role: 'Chief of Urban Development', declaredAssets: 32.8, year2022Assets: 8.5, year2026Assets: 32.8, flaggedAnomalies: true, keyAssets: ['4 Luxury Vehicles', 'Share Holdings in Hydropower', 'Gold 400g'] },
-  { id: 'p-4', name: 'Anita Shrestha', role: 'Education Department Head', declaredAssets: 12.1, year2022Assets: 10.0, year2026Assets: 12.1, flaggedAnomalies: false, keyAssets: ['Family Home', 'Savings Account'] },
-];
-
-const defaultPromisesData = [
-  { id: 'pr-1', title: 'Smart Traffic Management System', category: 'Infrastructure', progress: 75, status: 'In Progress', targetYear: 2026, budgetAllocated: '$4.2M' },
-  { id: 'pr-2', title: '100% Digital Ward Citizen Services', category: 'Technology', progress: 100, status: 'Completed', targetYear: 2025, budgetAllocated: '$1.8M' },
-  { id: 'pr-3', title: 'Clean Drinking Water Pipe Expansion', category: 'Public Health', progress: 30, status: 'Stalled', targetYear: 2027, budgetAllocated: '$12.0M' },
-  { id: 'pr-4', title: 'Municipal Waste Recycling Plant', category: 'Environment', progress: 10, status: 'Not Started', targetYear: 2028, budgetAllocated: '$8.5M' },
-  { id: 'pr-5', title: 'Public School Computer Lab Upgrade', category: 'Education', progress: 60, status: 'In Progress', targetYear: 2026, budgetAllocated: '$2.5M' },
-  { id: 'pr-6', title: 'Solar Powered Public Street Lighting', category: 'Energy', progress: 100, status: 'Completed', targetYear: 2025, budgetAllocated: '$3.1M' },
-];
-
-const defaultKYCData = [
-  { id: 'k-1', name: 'Rajesh Sharma', designation: 'Minister of Physical Infrastructure', nidNumber: 'NID-9942-8812', taxClearanceYear: 2025, conflictDeclared: true, kycStatus: 'Flagged' },
-  { id: 'k-2', name: 'Sita Adhikari', designation: 'Mayor - Pokhara Metropolitan', nidNumber: 'NID-4410-9921', taxClearanceYear: 2026, conflictDeclared: false, kycStatus: 'Verified' },
-  { id: 'k-3', name: 'Bikram Thapa', designation: 'Chief of Urban Development', nidNumber: 'NID-7731-0045', taxClearanceYear: 2024, conflictDeclared: true, kycStatus: 'Flagged' },
-  { id: 'k-4', name: 'Anita Shrestha', designation: 'Education Department Head', nidNumber: 'NID-1102-3389', taxClearanceYear: 2026, conflictDeclared: false, kycStatus: 'Verified' },
-  { id: 'k-5', name: 'Ramesh Karki', designation: 'Health Services Director', nidNumber: 'NID-8823-1142', taxClearanceYear: 2025, conflictDeclared: false, kycStatus: 'Pending' },
-  { id: 'k-6', name: 'Pooja Gurung', designation: 'IT & Digital Services Lead', nidNumber: 'NID-3391-7754', taxClearanceYear: 2026, conflictDeclared: false, kycStatus: 'Verified' },
-];
-
-const defaultComplaintsData = [
-  { id: 'GRV-1001', subject: 'Unrepaired Potholes on Main Ring Road', department: 'Roads & Infrastructure', status: 'Under Investigation', upvotes: 142, date: '2026-07-28' },
-  { id: 'GRV-1002', subject: 'Delayed Birth Certificate Issuance at Ward 3', department: 'Digital Governance & IT', status: 'Open', upvotes: 89, date: '2026-08-01' },
-  { id: 'GRV-1003', subject: 'Contaminated Water Supply in Sector 4', department: 'Water Resources & Sewage', status: 'Escalated', upvotes: 215, date: '2026-07-25' },
-  { id: 'GRV-1004', subject: 'Illegal Garbage Dumping Near Public School', department: 'Sanitation & Waste Management', status: 'Resolved', upvotes: 67, date: '2026-07-15' },
-  { id: 'GRV-1005', subject: 'Lack of Street Lights on Hospital Road', department: 'Roads & Infrastructure', status: 'Open', upvotes: 54, date: '2026-08-03' },
-];
-
-const defaultFAQData = [
-  { id: 'faq-1', question: 'What is GovTrace Hub?', answer: 'GovTrace Hub is a transparent civic portal tracking municipal budgets, public official asset disclosures, manifesto progress, KYC compliance, and citizen grievances.' },
-  { id: 'faq-2', question: 'How is municipal budget data sourced and updated?', answer: 'Budget data is fetched directly from government financial portals, treasury audits, and published budget allocation reports, updated quarterly.' },
-  { id: 'faq-3', question: 'How can citizens file a complaint or grievance?', answer: 'Citizens can navigate to the Complaints Hub page and click "File Grievance" to submit a ticket. Other citizens can upvote existing grievances to prioritize urgent issues.' },
-  { id: 'faq-4', question: 'What does "Flagged" status mean in Central Official KYC?', answer: 'A "Flagged" KYC status indicates potential discrepancies in tax clearance records, undeclared conflicts of interest, or unexplained wealth growth between asset filing periods.' },
-  { id: 'faq-5', question: 'How are Election Manifesto Promises tracked?', answer: 'Manifesto promises are monitored through independent project milestone verification, procurement logs, and physical infrastructure inspection reports.' },
-];
-
-// Auto-table creation helper to guarantee Neon DB structure & data hydration
-async function ensureTablesExist() {
-  try {
-    await sql`
-      CREATE TABLE IF NOT EXISTS budget_categories (
-        id TEXT PRIMARY KEY,
-        department TEXT UNIQUE NOT NULL,
-        allocated NUMERIC NOT NULL,
-        spent NUMERIC NOT NULL,
-        status TEXT NOT NULL
-      );
-    `;
-    
-    // NEW: Added Sub-department table creation
-    await sql`
-      CREATE TABLE IF NOT EXISTS sub_department_data (
-        id TEXT PRIMARY KEY,
-        department_name TEXT NOT NULL,
-        entity_name TEXT NOT NULL,
-        allocated NUMERIC NOT NULL,
-        spent NUMERIC NOT NULL,
-        status TEXT NOT NULL
-      );
-    `;
-    
-    await sql`
-      CREATE TABLE IF NOT EXISTS politician_assets (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        role TEXT NOT NULL,
-        declared_assets NUMERIC NOT NULL,
-        year_2022_assets NUMERIC NOT NULL,
-        year_2026_assets NUMERIC NOT NULL,
-        flagged_anomalies BOOLEAN NOT NULL DEFAULT false
-      );
-    `;
-    await sql`
-      CREATE TABLE IF NOT EXISTS key_assets (
-        id TEXT PRIMARY KEY,
-        description TEXT NOT NULL,
-        politician_id TEXT NOT NULL REFERENCES politician_assets(id) ON DELETE CASCADE
-      );
-    `;
-    await sql`
-      CREATE TABLE IF NOT EXISTS promise_items (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        category TEXT NOT NULL,
-        progress INT NOT NULL DEFAULT 0,
-        status TEXT NOT NULL,
-        target_year INT NOT NULL,
-        budget_allocated TEXT NOT NULL
-      );
-    `;
-    await sql`
-      CREATE TABLE IF NOT EXISTS kyc_records (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        designation TEXT NOT NULL,
-        nid_number TEXT UNIQUE NOT NULL,
-        tax_clearance_year INT NOT NULL,
-        conflict_declared BOOLEAN NOT NULL DEFAULT false,
-        kyc_status TEXT NOT NULL
-      );
-    `;
-    await sql`
-      CREATE TABLE IF NOT EXISTS complaint_items (
-        id TEXT PRIMARY KEY,
-        ticket_id TEXT UNIQUE NOT NULL,
-        subject TEXT NOT NULL,
-        department TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'Open',
-        upvotes INT NOT NULL DEFAULT 1,
-        date TEXT NOT NULL
-      );
-    `;
-    await sql`
-      CREATE TABLE IF NOT EXISTS faq_items (
-        id TEXT PRIMARY KEY,
-        question TEXT NOT NULL,
-        answer TEXT NOT NULL
-      );
-    `;
-
-    // Check if budget_categories has data; if empty, hydrate ALL Neon DB tables
-    const check = await sql`SELECT COUNT(*) as count FROM budget_categories`;
-    
-    if (Number(check[0]?.count || 0) === 0) {
-      for (const item of defaultBudgetData) {
-        await sql`
-          INSERT INTO budget_categories (id, department, allocated, spent, status)
-          VALUES (${item.id}, ${item.department}, ${item.allocated}, ${item.spent}, ${item.status})
-          ON CONFLICT (department) DO NOTHING;
-        `;
-      }
-
-      // NEW: Added Sub-department table hydration
-      for (const sub of defaultSubDepartmentData) {
-        await sql`
-          INSERT INTO sub_department_data (id, department_name, entity_name, allocated, spent, status)
-          VALUES (${sub.id}, ${sub.departmentName}, ${sub.entityName}, ${sub.allocated}, ${sub.spent}, ${sub.status})
-          ON CONFLICT (id) DO NOTHING;
-        `;
-      }
-
-      for (const pol of defaultPoliticianData) {
-        await sql`
-          INSERT INTO politician_assets (id, name, role, declared_assets, year_2022_assets, year_2026_assets, flagged_anomalies)
-          VALUES (${pol.id}, ${pol.name}, ${pol.role}, ${pol.declaredAssets}, ${pol.year2022Assets}, ${pol.year2026Assets}, ${pol.flaggedAnomalies})
-          ON CONFLICT (id) DO NOTHING;
-        `;
-        for (let i = 0; i < pol.keyAssets.length; i++) {
-          await sql`
-            INSERT INTO key_assets (id, description, politician_id)
-            VALUES (${`ka-${pol.id}-${i}`}, ${pol.keyAssets[i]}, ${pol.id})
-            ON CONFLICT (id) DO NOTHING;
-          `;
-        }
-      }
-
-      for (const p of defaultPromisesData) {
-        await sql`
-          INSERT INTO promise_items (id, title, category, progress, status, target_year, budget_allocated)
-          VALUES (${p.id}, ${p.title}, ${p.category}, ${p.progress}, ${p.status}, ${p.targetYear}, ${p.budgetAllocated})
-          ON CONFLICT (id) DO NOTHING;
-        `;
-      }
-
-      for (const k of defaultKYCData) {
-        await sql`
-          INSERT INTO kyc_records (id, name, designation, nid_number, tax_clearance_year, conflict_declared, kyc_status)
-          VALUES (${k.id}, ${k.name}, ${k.designation}, ${k.nidNumber}, ${k.taxClearanceYear}, ${k.conflictDeclared}, ${k.kycStatus})
-          ON CONFLICT (nid_number) DO NOTHING;
-        `;
-      }
-
-      for (const c of defaultComplaintsData) {
-        await sql`
-          INSERT INTO complaint_items (id, ticket_id, subject, department, status, upvotes, date)
-          VALUES (${c.id}, ${c.id}, ${c.subject}, ${c.department}, ${c.status}, ${c.upvotes}, ${c.date})
-          ON CONFLICT (ticket_id) DO NOTHING;
-        `;
-      }
-
-      for (const f of defaultFAQData) {
-        await sql`
-          INSERT INTO faq_items (id, question, answer)
-          VALUES (${f.id}, ${f.question}, ${f.answer})
-          ON CONFLICT (id) DO NOTHING;
-        `;
-      }
-    }
-  } catch (err) {
-    console.error('Error ensuring Neon DB tables exist or seeding:', err);
-  }
+  expenditureBreakdown: ExpenditureItem[];
 }
 
 // -------------------------------------------------------------
@@ -288,7 +78,6 @@ async function ensureTablesExist() {
 // -------------------------------------------------------------
 export async function getBudgetData(): Promise<BudgetCategory[]> {
   try {
-    await ensureTablesExist();
     const rows = await sql`
       SELECT id, department, allocated::float, spent::float, status 
       FROM budget_categories 
@@ -308,7 +97,6 @@ export async function getBudgetData(): Promise<BudgetCategory[]> {
 }
 
 export async function createBudgetCategory(data: Omit<BudgetCategory, 'id'>) {
-  await ensureTablesExist();
   const newId = `b-${Date.now()}`;
   await sql`
     INSERT INTO budget_categories (id, department, allocated, spent, status)
@@ -325,7 +113,6 @@ export async function createBudgetCategory(data: Omit<BudgetCategory, 'id'>) {
 // -------------------------------------------------------------
 export async function getPoliticianAssets(): Promise<PoliticianAsset[]> {
   try {
-    await ensureTablesExist();
     const rows = await sql`
       SELECT 
         p.id, p.name, p.role, 
@@ -360,7 +147,6 @@ export async function getPoliticianAssets(): Promise<PoliticianAsset[]> {
 // -------------------------------------------------------------
 export async function getPromisesData(): Promise<PromiseItem[]> {
   try {
-    await ensureTablesExist();
     const rows = await sql`
       SELECT id, title, category, progress, status, target_year AS "targetYear", budget_allocated AS "budgetAllocated"
       FROM promise_items
@@ -386,7 +172,6 @@ export async function getPromisesData(): Promise<PromiseItem[]> {
 // -------------------------------------------------------------
 export async function getKYCRecords(): Promise<KYCRecord[]> {
   try {
-    await ensureTablesExist();
     const rows = await sql`
       SELECT id, name, designation, nid_number AS "nidNumber", tax_clearance_year AS "taxClearanceYear", conflict_declared AS "conflictDeclared", kyc_status AS "kycStatus"
       FROM kyc_records
@@ -412,7 +197,6 @@ export async function getKYCRecords(): Promise<KYCRecord[]> {
 // -------------------------------------------------------------
 export async function getComplaintsData(): Promise<ComplaintItem[]> {
   try {
-    await ensureTablesExist();
     const rows = await sql`
       SELECT ticket_id AS id, subject, department, status, upvotes, date::text
       FROM complaint_items
@@ -433,7 +217,6 @@ export async function getComplaintsData(): Promise<ComplaintItem[]> {
 }
 
 export async function upvoteComplaint(ticketId: string) {
-  await ensureTablesExist();
   const rows = await sql`
     UPDATE complaint_items 
     SET upvotes = upvotes + 1 
@@ -452,7 +235,6 @@ export async function submitComplaint(newComplaint: {
   subject: string;
   department: string;
 }): Promise<ComplaintItem> {
-  await ensureTablesExist();
   const ticketId = `GRV-${Math.floor(1000 + Math.random() * 9000)}`;
   const today = new Date().toISOString().split('T')[0];
   const pkId = `c-${Date.now()}`;
@@ -480,7 +262,6 @@ export async function submitComplaint(newComplaint: {
 // -------------------------------------------------------------
 export async function getFAQData(): Promise<FAQItem[]> {
   try {
-    await ensureTablesExist();
     const rows = await sql`
       SELECT id, question, answer
       FROM faq_items
@@ -498,15 +279,13 @@ export async function getFAQData(): Promise<FAQItem[]> {
 }
 
 // -------------------------------------------------------------
-// 7. SUB-DEPARTMENT ACTIONS (FIXED FOR NEON SQL)
+// 7. SUB-DEPARTMENT ACTIONS (WITH JSONB SUPPORT)
 // -------------------------------------------------------------
 export async function getSubDepartmentData(departmentName: string): Promise<SubDepartmentData[]> {
   try {
-    await ensureTablesExist(); // Ensure the table is ready before querying
-    
     const rows = await sql`
       SELECT id, department_name AS "departmentName", entity_name AS "entityName", 
-             allocated::float, spent::float, status
+             allocated::float, spent::float, status, expenditure_breakdown
       FROM sub_department_data
       WHERE department_name = ${departmentName}
       ORDER BY allocated DESC
@@ -520,21 +299,11 @@ export async function getSubDepartmentData(departmentName: string): Promise<SubD
         allocated: Number(r.allocated),
         spent: Number(r.spent),
         status: String(r.status),
+        expenditureBreakdown: r.expenditure_breakdown || [],
       }));
     }
   } catch (err) {
     console.warn('Neon database query failed, serving fallback:', err);
   }
-
-  // Fallback data structure if offline or table is empty
-  return [
-    {
-      id: 'sub-fallback-1',
-      departmentName,
-      entityName: `${departmentName} Central Unit`,
-      allocated: 50,
-      spent: 45,
-      status: 'On Track',
-    },
-  ];
+  return [];
 }
