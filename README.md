@@ -24,6 +24,17 @@ The Good Governance platform addresses administrative bottlenecks by offering st
 
 ---
 
+## 💻 Tech Stack
+
+* **Framework:** Next.js 16.3 (App Router)
+* **Library:** React 19.2
+* **Language:** TypeScript 5
+* **Database:** Neon Serverless PostgreSQL
+* **ORM:** Prisma ORM 6.3
+* **Styling:** Tailwind CSS v4
+
+---
+
 ## 🛠️ Getting Started
 
 To set up and run this project locally, follow these steps:
