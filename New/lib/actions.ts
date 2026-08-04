@@ -454,3 +454,48 @@ export async function getFAQData(): Promise<FAQItem[]> {
     return [];
   }
 }
+
+export interface SubDepartmentData {
+  id: string;
+  departmentName: string;
+  entityName: string;
+  allocated: number;
+  spent: number;
+  status: string;
+}
+
+// Fetch breakdown sub-entities for a specific department from Neon
+export async function getSubDepartmentData(departmentName: string): Promise<SubDepartmentData[]> {
+  try {
+    const { data, error } = await supabase
+      .from('sub_department_data')
+      .select('*')
+      .eq('department_name', departmentName)
+      .order('allocated', { ascending: false });
+
+    if (!error && data && data.length > 0) {
+      return data.map((item: any) => ({
+        id: item.id,
+        departmentName: item.department_name,
+        entityName: item.entity_name,
+        allocated: Number(item.allocated),
+        spent: Number(item.spent),
+        status: item.status,
+      }));
+    }
+  } catch (err) {
+    console.warn('Fallback sub-department query triggered:', err);
+  }
+
+  // Fallback data structure if offline
+  return [
+    {
+      id: 'sub-fallback-1',
+      departmentName,
+      entityName: `${departmentName} Central Unit`,
+      allocated: 50,
+      spent: 45,
+      status: 'On Track',
+    },
+  ];
+}
