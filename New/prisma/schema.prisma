@@ -7,11 +7,38 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum BudgetStatus {
+  ON_TRACK      @map("On Track")
+  UNDERUTILIZED @map("Underutilized")
+  OVERBUDGET    @map("Overbudget")
+  AUDITED_FLAG  @map("Audited Flag")
+}
+
+enum PromiseStatus {
+  IN_PROGRESS @map("In Progress")
+  COMPLETED   @map("Completed")
+  STALLED     @map("Stalled")
+  NOT_STARTED @map("Not Started")
+}
+
+enum KYCStatus {
+  VERIFIED @map("Verified")
+  PENDING  @map("Pending")
+  FLAGGED  @map("Flagged")
+}
+
+enum ComplaintStatus {
+  OPEN                @map("Open")
+  UNDER_INVESTIGATION @map("Under Investigation")
+  RESOLVED            @map("Resolved")
+  ESCALATED           @map("Escalated")
+}
+
 model BudgetCategory {
   id         String   @id @default(cuid())
   department String   @unique
-  allocated  Float
-  spent      Float
+  allocated  Float    // in millions
+  spent      Float    // in millions
   status     String   // 'On Track' | 'Underutilized' | 'Overbudget' | 'Audited Flag'
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -21,9 +48,9 @@ model PoliticianAsset {
   id               String     @id @default(cuid())
   name             String
   role             String
-  declaredAssets   Float
-  year2022Assets   Float
-  year2026Assets   Float
+  declaredAssets   Float      // in millions
+  year2022Assets   Float      // in millions
+  year2026Assets   Float      // in millions
   flaggedAnomalies Boolean    @default(false)
   keyAssets        KeyAsset[]
   createdAt        DateTime   @default(now())
@@ -41,7 +68,7 @@ model PromiseItem {
   id              String   @id @default(cuid())
   title           String
   category        String
-  progress        Int      @default(0)
+  progress        Int      @default(0) // 0-100 percentage
   status          String   // 'In Progress' | 'Completed' | 'Stalled' | 'Not Started'
   targetYear      Int
   budgetAllocated String
@@ -77,6 +104,6 @@ model FAQItem {
   id        String   @id @default(cuid())
   question  String
   answer    String
-  category  String   @default("General")
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

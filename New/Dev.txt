@@ -12,3 +12,21 @@
 - Module 6 Built (`app/faq/page.tsx`): Governance FAQ knowledge base with accordion-style open/close interaction state and keyword search filtering.
 - Executive Dashboard Home (`app/page.tsx`): Central hub connecting all 6 audit modules with high-level KPI summary cards.
 - Project status: Fully Scaffolded, Production-Ready, and Operational MVP.
+
+[UPDATE 5 - PERSISTENT DATABASE ARCHITECTURE TRANSITION]
+- Evaluated stack options and selected Neon/Supabase PostgreSQL + Prisma ORM for zero-friction connection pooling, full Next.js Server Actions integration, and high-performance live mutations.
+- Added `@prisma/client`, `prisma`, and `tsx` dependencies to package.json.
+- Configured environment variables in `.env.local` with standard `DATABASE_URL` connection strings.
+- Created declarative Prisma Schema (`prisma/schema.prisma`) covering all 6 core models (`BudgetCategory`, `PoliticianAsset`, `KeyAsset`, `PromiseItem`, `KYCRecord`, `ComplaintItem`, `FAQItem`).
+- Initialized global Prisma Client singleton (`lib/db.ts`) with hot-reload connection protection for Next.js App Router development.
+- Built automated database seed script (`scripts/seed.ts`) importing records from `data/mockData.ts` with upsert operations for initial dataset hydration.
+- Designed type-safe Data Access Layer (`lib/actions.ts`) exposing Next.js Server Actions (`getBudgetData`, `getPoliticianAssets`, `getPromisesData`, `getKYCRecords`, `getComplaintsData`, `upvoteComplaint`, `submitComplaint`, `getFAQData`).
+
+[UPDATE 6 - ONLINE CLOUD DB INTEGRATION]
+- Selected Hosted Supabase Cloud (PostgreSQL) for instant serverless cloud database connectivity in GitHub Codespaces & Vercel.
+- Installed `@supabase/supabase-js` client SDK alongside `@prisma/client`.
+- Updated `.env.local` with `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and PgBouncer pooled `DATABASE_URL`.
+- Upgraded `lib/db.ts` to export serverless `supabase` JS client and connection-pooled `db` instance.
+- Configured `scripts/seed.ts` for automated cloud table hydration directly from `data/mockData.ts`.
+- Refactored `lib/actions.ts` Server Actions (`getBudgetData`, `getPoliticianAssets`, `getPromisesData`, `getKYCRecords`, `getComplaintsData`, `upvoteComplaint`, `submitComplaint`, `getFAQData`) to query the hosted cloud database directly with instant fallback safeguards.
+
