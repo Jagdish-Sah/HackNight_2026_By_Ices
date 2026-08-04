@@ -84,7 +84,7 @@ export default function BudgetPage() {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
               <PieChart className="text-blue-500" size={32} />
-              Municipal Budget Transparency
+              Budget Transparency
             </h1>
             <p className="text-slate-400 text-sm mt-1">
               Real-time expenditure tracking and multi-level audited breakdowns directly from Neon DBMS.
