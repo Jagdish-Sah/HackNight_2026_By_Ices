@@ -174,7 +174,7 @@ export default function BudgetPage() {
           <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-xl hover:border-slate-700 transition-colors">
             <div className="flex justify-between items-center text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">
               <span>Total Allocated</span>
-              <DollarSign className="text-blue-400" size={18} />
+              
             </div>
             <div className="text-2xl font-bold text-white">{formatCurrency(totalAllocated)}</div>
             <div className="text-xs text-slate-500 mt-1">Fiscal Year 2025/2026</div>
