@@ -1,0 +1,21 @@
+cat << 'EOF' >> Dev.txt
+
+[UPDATE 1]
+- Next.js initialized with App Router, Tailwind, TypeScript.
+- Installed lucide-react and recharts.
+- Created routing folders: /budget, /financials, /kyc, /tracker, /complaints, /faq.
+- Built global layout with persistent `components/Sidebar.tsx` utilizing Lucide icons.
+- App shell successfully routing to empty pages.
+- Next Step: Build the mock dataset (mockData.ts) and construct the Budget Expenditure Charts.
+EOF
+cat << 'EOF' >> Dev.txt
+
+[UPDATE 2]
+- Configured Codespaces Port 3000 visibility to Public for instant multi-device live viewing.
+- Created `data/mockData.ts` with typed interfaces and mock records for Budgets, Assets, and Promises.
+- Built `app/budget/page.tsx` complete with:
+  * Recharts visual rendering (BarChart for spent/allocated + PieChart for budget distribution).
+  * High-level financial metric cards.
+  * Real-time search filter and departmental audit table with color-coded status badges.
+- Next Step: Build Asset Disclosures page (`app/financials/page.tsx`) with growth tracking and anomaly flags.
+EOF
