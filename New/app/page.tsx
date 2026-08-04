@@ -5,39 +5,38 @@ import Link from 'next/link';
 import {
   getBudgetData,
   getPoliticianAssets,
-  getPromisesData,
-  getKYCRecords,
   getComplaintsData,
   BudgetCategory,
   PoliticianAsset,
-  PromiseItem,
-  KYCRecord,
   ComplaintItem,
 } from '@/lib/actions';
-import { PieChart, Wallet, ListTodo, ShieldCheck, MessageSquareWarning, ArrowRight, CheckCircle2, AlertTriangle, Building2, TrendingUp } from 'lucide-react';
+import {
+  PieChart,
+  Wallet,
+  MessageSquareWarning,
+  ArrowRight,
+  AlertTriangle,
+  Building2,
+  TrendingUp,
+  ShieldCheck,
+} from 'lucide-react';
 
 export default function Home() {
   const [budget, setBudget] = useState<BudgetCategory[]>([]);
   const [politicians, setPoliticians] = useState<PoliticianAsset[]>([]);
-  const [promises, setPromises] = useState<PromiseItem[]>([]);
-  const [kyc, setKYC] = useState<KYCRecord[]>([]);
   const [complaints, setComplaints] = useState<ComplaintItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadAllDashboardMetrics() {
       try {
-        const [bRes, pRes, prRes, kRes, cRes] = await Promise.all([
+        const [bRes, pRes, cRes] = await Promise.all([
           getBudgetData(),
           getPoliticianAssets(),
-          getPromisesData(),
-          getKYCRecords(),
           getComplaintsData(),
         ]);
         setBudget(bRes);
         setPoliticians(pRes);
-        setPromises(prRes);
-        setKYC(kRes);
         setComplaints(cRes);
       } finally {
         setLoading(false);
@@ -49,9 +48,9 @@ export default function Home() {
   const totalAllocated = budget.reduce((acc, curr) => acc + curr.allocated, 0);
   const totalSpent = budget.reduce((acc, curr) => acc + curr.spent, 0);
   const flaggedOfficials = politicians.filter((item) => item.flaggedAnomalies).length;
-  const completedPromises = promises.filter((item) => item.status === 'Completed').length;
-  const totalPromises = promises.length;
-  const openComplaints = complaints.filter((item) => item.status === 'Open' || item.status === 'Under Investigation').length;
+  const openComplaints = complaints.filter(
+    (item) => item.status === 'Open' || item.status === 'Under Investigation'
+  ).length;
 
   return (
     <div className="space-y-8">
@@ -64,13 +63,13 @@ export default function Home() {
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight">Executive Governance Dashboard</h1>
           <p className="text-slate-300 text-base leading-relaxed">
-            Real-time public oversight portal monitoring municipal budget execution, official wealth disclosures, manifesto promise completion, KYC compliance, and crowdsourced grievances directly from the online cloud database.
+            Real-time public oversight portal monitoring municipal budget execution, official wealth disclosures, and crowdsourced grievances directly from the online cloud database.
           </p>
         </div>
       </div>
 
-      {/* Quick KPI Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Quick KPI Overview (3 Cards) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Budget Spent / Total</p>
@@ -84,22 +83,6 @@ export default function Home() {
           </div>
           <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
             <PieChart size={24} />
-          </div>
-        </div>
-
-        <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-slate-500">Manifesto Pledges</p>
-            <p className="text-2xl font-bold text-slate-900">
-              {loading ? '...' : `${completedPromises} / ${totalPromises} Done`}
-            </p>
-            <span className="text-xs text-blue-600 font-semibold flex items-center gap-1 mt-1">
-              <CheckCircle2 size={12} />
-              {totalPromises > 0 ? ((completedPromises / totalPromises) * 100).toFixed(0) : 0}% completed
-            </span>
-          </div>
-          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
-            <ListTodo size={24} />
           </div>
         </div>
 
@@ -135,10 +118,10 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Navigation Modules Cards */}
+      {/* Navigation Modules Cards (4 Cards) */}
       <div>
         <h2 className="text-xl font-bold text-slate-900 mb-4">Governance Audit Modules</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link
             href="/budget"
             className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all group space-y-3"
@@ -168,38 +151,6 @@ export default function Home() {
             <h3 className="text-lg font-bold text-slate-900">Public Official Asset Disclosures</h3>
             <p className="text-sm text-slate-600">
               Comparative wealth tracking from 2022 to 2026 with anomaly detection for elected officials.
-            </p>
-          </Link>
-
-          <Link
-            href="/tracker"
-            className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all group space-y-3"
-          >
-            <div className="flex items-center justify-between">
-              <div className="p-3 bg-purple-50 text-purple-600 rounded-lg group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                <ListTodo size={24} />
-              </div>
-              <ArrowRight size={18} className="text-slate-400 group-hover:text-purple-600 transition-colors" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900">Election Promise Tracker</h3>
-            <p className="text-sm text-slate-600">
-              Manifesto commitments, completion percentage bars, target years, and budget allocations.
-            </p>
-          </Link>
-
-          <Link
-            href="/kyc"
-            className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all group space-y-3"
-          >
-            <div className="flex items-center justify-between">
-              <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                <ShieldCheck size={24} />
-              </div>
-              <ArrowRight size={18} className="text-slate-400 group-hover:text-indigo-600 transition-colors" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-900">Central Official KYC</h3>
-            <p className="text-sm text-slate-600">
-              Identity verification, national ID compliance, tax clearance status, and conflict disclosures.
             </p>
           </Link>
 
