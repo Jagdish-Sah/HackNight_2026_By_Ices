@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, useMemo, useCallback, Fragment } from 'react';
 import { 
   getBudgetData, 
   getSubDepartmentData, 
@@ -25,6 +25,13 @@ import {
   ShieldAlert
 } from 'lucide-react';
 
+interface ExpenditureItem {
+  task: string;
+  amount: number;
+  expectedPrice?: number;
+  status: string;
+}
+
 export default function BudgetPage() {
   const [budgets, setBudgets] = useState<BudgetCategory[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -34,47 +41,76 @@ export default function BudgetPage() {
   const [selectedDept, setSelectedDept] = useState<string | null>(null);
   const [subData, setSubData] = useState<SubDepartmentData[]>([]);
   const [loadingSub, setLoadingSub] = useState<boolean>(false);
+  const [subError, setSubError] = useState<string | null>(null);
   const [expandedSubEntity, setExpandedSubEntity] = useState<string | null>(null);
 
+  // Fetch initial data
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const data = await getBudgetData();
-      setBudgets(data);
-      setLoading(false);
+      try {
+        const data = await getBudgetData();
+        setBudgets(data);
+      } catch (error) {
+        console.error('Failed to load budget data:', error);
+      } finally {
+        setLoading(false);
+      }
     }
     loadData();
   }, []);
+
+  const closeDrawer = useCallback(() => {
+    setSelectedDept(null);
+    setSubData([]);
+    setExpandedSubEntity(null);
+    setSubError(null);
+  }, []);
+
+  // Close drawer on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedDept) {
+        closeDrawer();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedDept, closeDrawer]);
 
   const handleSelectDepartment = async (deptName: string) => {
     setSelectedDept(deptName);
     setLoadingSub(true);
     setExpandedSubEntity(null);
+    setSubError(null);
     try {
       const details = await getSubDepartmentData(deptName);
       setSubData(details);
     } catch (error) {
       console.error('Failed to load sub-department data:', error);
+      setSubError('Failed to load detailed records. Please try again later.');
       setSubData([]);
     } finally {
       setLoadingSub(false);
     }
   };
 
-  const closeDrawer = () => {
-    setSelectedDept(null);
-    setSubData([]);
-    setExpandedSubEntity(null);
-  };
-
-  const filteredBudgets = budgets.filter((b) =>
-    b.department.toLowerCase().includes(searchQuery.toLowerCase())
+  // Memoized calculations to prevent unnecessary recalculations on search
+  const filteredBudgets = useMemo(() => 
+    budgets.filter((b) =>
+      b.department.toLowerCase().includes(searchQuery.toLowerCase())
+    ),
+    [budgets, searchQuery]
   );
 
-  const totalAllocated = budgets.reduce((acc, curr) => acc + Number(curr.allocated), 0);
-  const totalSpent = budgets.reduce((acc, curr) => acc + Number(curr.spent), 0);
-  const utilizationRate = totalAllocated > 0 ? ((totalSpent / totalAllocated) * 100).toFixed(1) : '0';
-  const flaggedCount = budgets.filter((b) => b.status === 'Audited Flag' || b.status === 'Overbudget').length;
+  const { totalAllocated, totalSpent, utilizationRate, flaggedCount } = useMemo(() => {
+    const allocated = budgets.reduce((acc, curr) => acc + Number(curr.allocated), 0);
+    const spent = budgets.reduce((acc, curr) => acc + Number(curr.spent), 0);
+    const rate = allocated > 0 ? ((spent / allocated) * 100).toFixed(1) : '0';
+    const flagged = budgets.filter((b) => b.status === 'Audited Flag' || b.status === 'Overbudget').length;
+
+    return { totalAllocated: allocated, totalSpent: spent, utilizationRate: rate, flaggedCount: flagged };
+  }, [budgets]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6 lg:p-8 relative">
@@ -103,7 +139,7 @@ export default function BudgetPage() {
               <span>Total Allocated</span>
               <DollarSign className="text-blue-400" size={18} />
             </div>
-            <div className="text-2xl font-bold text-white">${totalAllocated}M</div>
+            <div className="text-2xl font-bold text-white">{totalAllocated.toLocaleString()}</div>
             <div className="text-xs text-slate-500 mt-1">Fiscal Year 2025/2026</div>
           </div>
 
@@ -112,7 +148,7 @@ export default function BudgetPage() {
               <span>Total Disbursed</span>
               <TrendingUp className="text-emerald-400" size={18} />
             </div>
-            <div className="text-2xl font-bold text-white">${totalSpent}M</div>
+            <div className="text-2xl font-bold text-white">{totalSpent.toLocaleString()}</div>
             <div className="text-xs text-emerald-400 mt-1">{utilizationRate}% Utilization</div>
           </div>
 
@@ -121,7 +157,7 @@ export default function BudgetPage() {
               <span>Remaining Funds</span>
               <CheckCircle2 className="text-indigo-400" size={18} />
             </div>
-            <div className="text-2xl font-bold text-white">${(totalAllocated - totalSpent).toFixed(1)}M</div>
+            <div className="text-2xl font-bold text-white">{(totalAllocated - totalSpent).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</div>
             <div className="text-xs text-slate-500 mt-1">Available in Treasury</div>
           </div>
 
@@ -187,8 +223,8 @@ export default function BudgetPage() {
                           <Building2 className="text-slate-500 group-hover:text-blue-400 transition-colors" size={18} />
                           {b.department}
                         </td>
-                        <td className="py-4 px-6 font-mono text-slate-300">${b.allocated}M</td>
-                        <td className="py-4 px-6 font-mono text-slate-300">${b.spent}M</td>
+                        <td className="py-4 px-6 font-mono text-slate-300">{b.allocated}</td>
+                        <td className="py-4 px-6 font-mono text-slate-300">{b.spent}</td>
                         <td className="py-4 px-6 w-48">
                           <div className="flex items-center gap-3">
                             <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
@@ -220,10 +256,7 @@ export default function BudgetPage() {
                         </td>
                         <td className="py-4 px-6 text-right">
                           <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSelectDepartment(b.department);
-                            }}
+                            aria-label={`Drill down into ${b.department}`}
                             className="inline-flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 font-medium group-hover:translate-x-0.5 transition-transform"
                           >
                             Drill Down
@@ -250,7 +283,10 @@ export default function BudgetPage() {
       {/* DRILL-DOWN MODAL / SIDE-DRAWER */}
       {selectedDept && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex justify-end transition-opacity">
-          <div className="w-full max-w-4xl bg-slate-900 border-l border-slate-800 h-full overflow-y-auto flex flex-col shadow-2xl">
+          {/* Backdrop clickable area to close drawer */}
+          <div className="absolute inset-0" onClick={closeDrawer} aria-hidden="true" />
+          
+          <div className="w-full max-w-4xl bg-slate-900 border-l border-slate-800 h-full overflow-y-auto flex flex-col shadow-2xl relative z-10 transform transition-transform duration-300">
             {/* DRAWER HEADER */}
             <div className="p-6 border-b border-slate-800 flex items-center justify-between sticky top-0 bg-slate-900/95 backdrop-blur z-10">
               <div className="flex items-center gap-3">
@@ -264,6 +300,7 @@ export default function BudgetPage() {
               </div>
               <button
                 onClick={closeDrawer}
+                aria-label="Close drawer"
                 className="p-2 text-slate-400 hover:text-white bg-slate-800/50 hover:bg-slate-800 rounded-lg transition-colors"
               >
                 <X size={20} />
@@ -276,6 +313,11 @@ export default function BudgetPage() {
                 <div className="py-20 text-center flex flex-col items-center gap-3 text-slate-400">
                   <Loader2 className="animate-spin text-blue-500" size={28} />
                   <p className="text-sm">Querying sub-department tables & JSON breakdowns...</p>
+                </div>
+              ) : subError ? (
+                <div className="py-16 text-center text-red-400 border border-dashed border-red-900/50 rounded-xl p-8 bg-red-950/10">
+                  <AlertTriangle className="mx-auto mb-3 text-red-500" size={36} />
+                  <p className="text-sm">{subError}</p>
                 </div>
               ) : subData.length === 0 ? (
                 <div className="py-16 text-center text-slate-500 border border-dashed border-slate-800 rounded-xl p-8">
@@ -300,9 +342,8 @@ export default function BudgetPage() {
                       </thead>
                       <tbody className="divide-y divide-slate-800/60 text-sm">
                         {subData.map((sub) => {
-                          // Calculate Total Itemized and Unaccounted differences
                           const totalItemized = (sub.expenditureBreakdown || []).reduce(
-                            (acc: number, item: any) => acc + (Number(item.amount) || 0), 0
+                            (acc: number, item: ExpenditureItem) => acc + (Number(item.amount) || 0), 0
                           );
                           const unaccounted = Number(sub.spent) - totalItemized;
 
@@ -321,8 +362,8 @@ export default function BudgetPage() {
                                   />
                                   {sub.entityName}
                                 </td>
-                                <td className="py-3.5 px-4 font-mono text-slate-300">${sub.allocated}M</td>
-                                <td className="py-3.5 px-4 font-mono text-slate-300">${sub.spent}M</td>
+                                <td className="py-3.5 px-4 font-mono text-slate-300">{sub.allocated}</td>
+                                <td className="py-3.5 px-4 font-mono text-slate-300">{sub.spent}</td>
                                 <td className="py-3.5 px-4">
                                   <span
                                     className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
@@ -362,32 +403,34 @@ export default function BudgetPage() {
                                           <div className="col-span-2 text-right">Status</div>
                                         </div>
 
-                                        {sub.expenditureBreakdown.map((item: any, idx: number) => {
+                                        {sub.expenditureBreakdown.map((item: ExpenditureItem, idx: number) => {
                                           const hasExpected = item.expectedPrice !== undefined && item.expectedPrice > 0;
-                                          const diff = hasExpected ? item.amount - item.expectedPrice : 0;
-                                          const deviationPct = hasExpected ? (diff / item.expectedPrice) * 100 : 0;
+                                          const diff = hasExpected ? item.amount - item.expectedPrice! : 0;
+                                          const deviationPct = hasExpected ? (diff / item.expectedPrice!) * 100 : 0;
                                           const isFlagged = deviationPct > 15; // Flag if marked up > 15%
 
                                           return (
                                             <div
                                               key={idx}
-                                              className={`grid grid-cols-12 gap-4 items-center p-3 rounded-lg border text-xs ${
+                                              className={`grid grid-cols-12 gap-4 items-center p-3 rounded-lg border text-xs transition-colors ${
                                                 isFlagged 
                                                   ? 'bg-red-950/20 border-red-900/50' 
-                                                  : 'bg-slate-950 border-slate-800/80'
+                                                  : 'bg-slate-950 border-slate-800/80 hover:border-slate-700'
                                               }`}
                                             >
                                               <div className="col-span-4 flex items-center gap-2">
-                                                {isFlagged && <ShieldAlert size={14} className="text-red-500" />}
-                                                <span className="font-medium text-slate-200">{item.task}</span>
+                                                {isFlagged && <ShieldAlert size={14} className="text-red-500 shrink-0" />}
+                                                <span className="font-medium text-slate-200 line-clamp-2" title={item.task}>
+                                                  {item.task}
+                                                </span>
                                               </div>
                                               
                                               <div className="col-span-2 text-right font-mono text-slate-400">
-                                                {hasExpected ? `$${item.expectedPrice}M` : 'N/A'}
+                                                {hasExpected ? item.expectedPrice : 'N/A'}
                                               </div>
 
                                               <div className="col-span-2 text-right font-mono font-bold text-white">
-                                                ${item.amount}M
+                                                {item.amount}
                                               </div>
 
                                               <div className="col-span-2 text-right font-mono">
@@ -419,23 +462,23 @@ export default function BudgetPage() {
                                         {/* UNACCOUNTED FUNDS ROW */}
                                         {unaccounted > 0 && (
                                           <div className="mt-4 grid grid-cols-12 gap-4 items-center bg-red-950/40 p-3 rounded-lg border border-red-900/80 text-xs shadow-[0_0_15px_rgba(239,68,68,0.1)]">
-                                            <div className="col-span-6 flex items-center gap-3">
-                                              <AlertTriangle className="text-red-500" size={16} />
+                                            <div className="col-span-8 flex items-center gap-3">
+                                              <AlertTriangle className="text-red-500 shrink-0" size={16} />
                                               <span className="font-bold text-red-400 uppercase tracking-wide">
                                                 Not Defined / Unaccounted Discrepancy
                                               </span>
-                                              <span className="text-slate-400 font-normal italic text-[10px]">
+                                              <span className="text-slate-400 font-normal italic text-[10px] hidden sm:inline">
                                                 (Parent Spent vs Itemized Total)
                                               </span>
                                             </div>
-                                            <div className="col-span-6 text-right font-mono font-bold text-red-400 text-sm">
-                                              ${unaccounted.toFixed(2)}M Missing
+                                            <div className="col-span-4 text-right font-mono font-bold text-red-400 text-sm">
+                                              {unaccounted.toFixed(2)} Missing
                                             </div>
                                           </div>
                                         )}
                                       </div>
                                     ) : (
-                                      <div className="py-4 text-center text-slate-500 text-xs italic">
+                                      <div className="py-4 text-center text-slate-500 text-xs italic bg-slate-950/50 rounded-lg border border-slate-800/50">
                                         No itemized task breakdown stored for this entity.
                                       </div>
                                     )}
@@ -453,11 +496,11 @@ export default function BudgetPage() {
             </div>
 
             {/* DRAWER FOOTER */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950/50 text-xs text-slate-500 flex justify-between items-center">
+            <div className="p-4 border-t border-slate-800 bg-slate-950/50 text-xs text-slate-500 flex justify-between items-center sticky bottom-0 z-10 backdrop-blur-sm">
               <span>Audited under Procurement Act Section 4</span>
               <button
                 onClick={closeDrawer}
-                className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors"
+                className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-slate-500"
               >
                 Close Drawer
               </button>
