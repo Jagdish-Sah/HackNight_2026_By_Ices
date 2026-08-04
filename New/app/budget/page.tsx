@@ -20,7 +20,9 @@ import {
   Building2,
   ListOrdered,
   Loader2,
-  FileSpreadsheet
+  FileSpreadsheet,
+  ArrowUpRight,
+  ShieldAlert
 } from 'lucide-react';
 
 export default function BudgetPage() {
@@ -248,7 +250,7 @@ export default function BudgetPage() {
       {/* DRILL-DOWN MODAL / SIDE-DRAWER */}
       {selectedDept && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex justify-end transition-opacity">
-          <div className="w-full max-w-3xl bg-slate-900 border-l border-slate-800 h-full overflow-y-auto flex flex-col shadow-2xl">
+          <div className="w-full max-w-4xl bg-slate-900 border-l border-slate-800 h-full overflow-y-auto flex flex-col shadow-2xl">
             {/* DRAWER HEADER */}
             <div className="p-6 border-b border-slate-800 flex items-center justify-between sticky top-0 bg-slate-900/95 backdrop-blur z-10">
               <div className="flex items-center gap-3">
@@ -292,96 +294,157 @@ export default function BudgetPage() {
                         <tr className="bg-slate-950 text-slate-400 text-xs uppercase font-semibold border-b border-slate-800">
                           <th className="py-3 px-4">Entity / Institution</th>
                           <th className="py-3 px-4">Allocated</th>
-                          <th className="py-3 px-4">Spent</th>
+                          <th className="py-3 px-4">Claimed Spent</th>
                           <th className="py-3 px-4">Status</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/60 text-sm">
-                        {subData.map((sub) => (
-                          <Fragment key={sub.id}>
-                            <tr
-                              onClick={() => setExpandedSubEntity(expandedSubEntity === sub.id ? null : sub.id)}
-                              className="hover:bg-slate-800/60 cursor-pointer transition-colors group"
-                            >
-                              <td className="py-3.5 px-4 font-medium text-white flex items-center gap-2.5">
-                                <ChevronRight
-                                  size={16}
-                                  className={`text-slate-500 transition-transform ${
-                                    expandedSubEntity === sub.id ? 'rotate-90 text-blue-400' : 'group-hover:text-slate-300'
-                                  }`}
-                                />
-                                {sub.entityName}
-                              </td>
-                              <td className="py-3.5 px-4 font-mono text-slate-300">${sub.allocated}M</td>
-                              <td className="py-3.5 px-4 font-mono text-slate-300">${sub.spent}M</td>
-                              <td className="py-3.5 px-4">
-                                <span
-                                  className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
-                                    sub.status === 'On Track'
-                                      ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/50'
-                                      : sub.status === 'Overbudget'
-                                      ? 'bg-red-950 text-red-400 border border-red-800/50'
-                                      : 'bg-amber-950 text-amber-400 border border-amber-800/50'
-                                  }`}
-                                >
-                                  {sub.status}
-                                </span>
-                              </td>
-                            </tr>
+                        {subData.map((sub) => {
+                          // Calculate Total Itemized and Unaccounted differences
+                          const totalItemized = (sub.expenditureBreakdown || []).reduce(
+                            (acc: number, item: any) => acc + (Number(item.amount) || 0), 0
+                          );
+                          const unaccounted = Number(sub.spent) - totalItemized;
 
-                            {/* LEVEL 3 EXPANDED JSON TASK BREAKDOWN */}
-                            {expandedSubEntity === sub.id && (
-                              <tr className="bg-slate-900/90">
-                                <td colSpan={4} className="py-4 px-6 border-l-2 border-blue-500">
-                                  <div className="mb-3 flex items-center justify-between">
-                                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                      Itemized Expenditure Breakdown (JSON Query)
-                                    </h4>
-                                    <span className="text-[10px] font-mono bg-blue-950 text-blue-300 border border-blue-800/50 px-2 py-0.5 rounded">
-                                      sub_department_data.expenditure_breakdown
-                                    </span>
-                                  </div>
-
-                                  {sub.expenditureBreakdown && sub.expenditureBreakdown.length > 0 ? (
-                                    <div className="space-y-2">
-                                      {sub.expenditureBreakdown.map((item, idx) => (
-                                        <div
-                                          key={idx}
-                                          className="flex items-center justify-between bg-slate-950 p-3 rounded-lg border border-slate-800/80 text-xs"
-                                        >
-                                          <div className="flex items-center gap-3">
-                                            <div
-                                              className={`w-2 h-2 rounded-full ${
-                                                item.status === 'Completed' ? 'bg-emerald-500' : 'bg-amber-500'
-                                              }`}
-                                            ></div>
-                                            <span className="font-medium text-slate-200">{item.task}</span>
-                                          </div>
-                                          <div className="flex items-center gap-4">
-                                            <span
-                                              className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
-                                                item.status === 'Completed'
-                                                  ? 'bg-emerald-950 text-emerald-400'
-                                                  : 'bg-amber-950 text-amber-400'
-                                              }`}
-                                            >
-                                              {item.status}
-                                            </span>
-                                            <span className="font-mono font-bold text-white">${item.amount}M</span>
-                                          </div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  ) : (
-                                    <div className="py-4 text-center text-slate-500 text-xs italic">
-                                      No itemized task breakdown stored for this entity.
-                                    </div>
-                                  )}
+                          return (
+                            <Fragment key={sub.id}>
+                              <tr
+                                onClick={() => setExpandedSubEntity(expandedSubEntity === sub.id ? null : sub.id)}
+                                className="hover:bg-slate-800/60 cursor-pointer transition-colors group"
+                              >
+                                <td className="py-3.5 px-4 font-medium text-white flex items-center gap-2.5">
+                                  <ChevronRight
+                                    size={16}
+                                    className={`text-slate-500 transition-transform ${
+                                      expandedSubEntity === sub.id ? 'rotate-90 text-blue-400' : 'group-hover:text-slate-300'
+                                    }`}
+                                  />
+                                  {sub.entityName}
+                                </td>
+                                <td className="py-3.5 px-4 font-mono text-slate-300">${sub.allocated}M</td>
+                                <td className="py-3.5 px-4 font-mono text-slate-300">${sub.spent}M</td>
+                                <td className="py-3.5 px-4">
+                                  <span
+                                    className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${
+                                      sub.status === 'On Track'
+                                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/50'
+                                        : sub.status === 'Overbudget'
+                                        ? 'bg-red-950 text-red-400 border border-red-800/50'
+                                        : 'bg-amber-950 text-amber-400 border border-amber-800/50'
+                                    }`}
+                                  >
+                                    {sub.status}
+                                  </span>
                                 </td>
                               </tr>
-                            )}
-                          </Fragment>
-                        ))}
+
+                              {/* LEVEL 3 EXPANDED JSON TASK BREAKDOWN */}
+                              {expandedSubEntity === sub.id && (
+                                <tr className="bg-slate-900/90">
+                                  <td colSpan={4} className="py-4 px-6 border-l-2 border-blue-500">
+                                    <div className="mb-4 flex items-center justify-between">
+                                      <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                        <Layers size={14} /> Itemized Expenditure Breakdown
+                                      </h4>
+                                      <span className="text-[10px] font-mono bg-blue-950 text-blue-300 border border-blue-800/50 px-2 py-0.5 rounded">
+                                        JSONB Audit View
+                                      </span>
+                                    </div>
+
+                                    {sub.expenditureBreakdown && sub.expenditureBreakdown.length > 0 ? (
+                                      <div className="space-y-3">
+                                        {/* Table Header for Breakdown */}
+                                        <div className="grid grid-cols-12 gap-4 text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-800 pb-2 px-2">
+                                          <div className="col-span-4">Task Description</div>
+                                          <div className="col-span-2 text-right">Expected</div>
+                                          <div className="col-span-2 text-right">Actual Paid</div>
+                                          <div className="col-span-2 text-right">Deviation</div>
+                                          <div className="col-span-2 text-right">Status</div>
+                                        </div>
+
+                                        {sub.expenditureBreakdown.map((item: any, idx: number) => {
+                                          const hasExpected = item.expectedPrice !== undefined && item.expectedPrice > 0;
+                                          const diff = hasExpected ? item.amount - item.expectedPrice : 0;
+                                          const deviationPct = hasExpected ? (diff / item.expectedPrice) * 100 : 0;
+                                          const isFlagged = deviationPct > 15; // Flag if marked up > 15%
+
+                                          return (
+                                            <div
+                                              key={idx}
+                                              className={`grid grid-cols-12 gap-4 items-center p-3 rounded-lg border text-xs ${
+                                                isFlagged 
+                                                  ? 'bg-red-950/20 border-red-900/50' 
+                                                  : 'bg-slate-950 border-slate-800/80'
+                                              }`}
+                                            >
+                                              <div className="col-span-4 flex items-center gap-2">
+                                                {isFlagged && <ShieldAlert size={14} className="text-red-500" />}
+                                                <span className="font-medium text-slate-200">{item.task}</span>
+                                              </div>
+                                              
+                                              <div className="col-span-2 text-right font-mono text-slate-400">
+                                                {hasExpected ? `$${item.expectedPrice}M` : 'N/A'}
+                                              </div>
+
+                                              <div className="col-span-2 text-right font-mono font-bold text-white">
+                                                ${item.amount}M
+                                              </div>
+
+                                              <div className="col-span-2 text-right font-mono">
+                                                {hasExpected ? (
+                                                  <span className={`flex items-center justify-end gap-1 ${isFlagged ? 'text-red-400' : deviationPct < 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                                    {deviationPct > 0 && <ArrowUpRight size={12} />}
+                                                    {deviationPct > 0 ? '+' : ''}{deviationPct.toFixed(1)}%
+                                                  </span>
+                                                ) : (
+                                                  <span className="text-slate-600">-</span>
+                                                )}
+                                              </div>
+
+                                              <div className="col-span-2 text-right">
+                                                <span
+                                                  className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                                                    item.status === 'Completed'
+                                                      ? 'bg-emerald-950 text-emerald-400'
+                                                      : 'bg-amber-950 text-amber-400'
+                                                  }`}
+                                                >
+                                                  {item.status}
+                                                </span>
+                                              </div>
+                                            </div>
+                                          );
+                                        })}
+
+                                        {/* UNACCOUNTED FUNDS ROW */}
+                                        {unaccounted > 0 && (
+                                          <div className="mt-4 grid grid-cols-12 gap-4 items-center bg-red-950/40 p-3 rounded-lg border border-red-900/80 text-xs shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+                                            <div className="col-span-6 flex items-center gap-3">
+                                              <AlertTriangle className="text-red-500" size={16} />
+                                              <span className="font-bold text-red-400 uppercase tracking-wide">
+                                                Not Defined / Unaccounted Discrepancy
+                                              </span>
+                                              <span className="text-slate-400 font-normal italic text-[10px]">
+                                                (Parent Spent vs Itemized Total)
+                                              </span>
+                                            </div>
+                                            <div className="col-span-6 text-right font-mono font-bold text-red-400 text-sm">
+                                              ${unaccounted.toFixed(2)}M Missing
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <div className="py-4 text-center text-slate-500 text-xs italic">
+                                        No itemized task breakdown stored for this entity.
+                                      </div>
+                                    )}
+                                  </td>
+                                </tr>
+                              )}
+                            </Fragment>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
