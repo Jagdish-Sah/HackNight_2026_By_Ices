@@ -5,8 +5,7 @@ const navItems = [
   { name: 'Dashboard', href: '/', icon: Home },
   { name: 'Budget Expenditure', href: '/budget', icon: PieChart },
   { name: 'Asset Disclosures', href: '/financials', icon: Wallet },
-  { name: 'Central KYC', href: '/kyc', icon: ShieldCheck },
-  { name: 'Promise Tracker', href: '/tracker', icon: ListTodo },
+  
   { name: 'Complaints Hub', href: '/complaints', icon: MessageSquareWarning },
   { name: 'FAQ', href: '/faq', icon: HelpCircle },
 ];
