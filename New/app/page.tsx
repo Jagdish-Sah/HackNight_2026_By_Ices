@@ -74,7 +74,7 @@ export default function Home() {
           <div>
             <p className="text-sm font-medium text-slate-500">Budget Spent / Total</p>
             <p className="text-2xl font-bold text-slate-900">
-              {loading ? '...' : `$${totalSpent}M / $${totalAllocated}M`}
+              {loading ? '...' : `$${totalSpent} / $${totalAllocated}`}
             </p>
             <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1 mt-1">
               <TrendingUp size={12} />
