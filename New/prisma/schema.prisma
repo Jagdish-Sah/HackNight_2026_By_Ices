@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model BudgetCategory {
+  id         String   @id @default(cuid())
+  department String   @unique
+  allocated  Float
+  spent      Float
+  status     String   // 'On Track' | 'Underutilized' | 'Overbudget' | 'Audited Flag'
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PoliticianAsset {
+  id               String     @id @default(cuid())
+  name             String
+  role             String
+  declaredAssets   Float
+  year2022Assets   Float
+  year2026Assets   Float
+  flaggedAnomalies Boolean    @default(false)
+  keyAssets        KeyAsset[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+}
+
+model KeyAsset {
+  id           String          @id @default(cuid())
+  description  String
+  politicianId String
+  politician   PoliticianAsset @relation(fields: [politicianId], references: [id], onDelete: Cascade)
+}
+
+model PromiseItem {
+  id              String   @id @default(cuid())
+  title           String
+  category        String
+  progress        Int      @default(0)
+  status          String   // 'In Progress' | 'Completed' | 'Stalled' | 'Not Started'
+  targetYear      Int
+  budgetAllocated String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model KYCRecord {
+  id               String   @id @default(cuid())
+  name             String
+  designation      String
+  nidNumber        String   @unique
+  taxClearanceYear Int
+  conflictDeclared Boolean  @default(false)
+  kycStatus        String   // 'Verified' | 'Pending' | 'Flagged'
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model ComplaintItem {
+  id         String   @id @default(cuid())
+  ticketId   String   @unique
+  subject    String
+  department String
+  status     String   @default("Open") // 'Open' | 'Under Investigation' | 'Resolved' | 'Escalated'
+  upvotes    Int      @default(1)
+  date       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model FAQItem {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  category  String   @default("General")
+  createdAt DateTime @default(now())
+}
