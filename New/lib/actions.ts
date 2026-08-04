@@ -57,6 +57,15 @@ export interface FAQItem {
   answer: string;
 }
 
+export interface SubDepartmentData {
+  id: string;
+  departmentName: string;
+  entityName: string;
+  allocated: number;
+  spent: number;
+  status: string;
+}
+
 const defaultBudgetData = [
   { id: 'b-1', department: 'Roads & Infrastructure', allocated: 450, spent: 390, status: 'On Track' },
   { id: 'b-2', department: 'Public Health Services', allocated: 280, spent: 120, status: 'Underutilized' },
@@ -64,6 +73,16 @@ const defaultBudgetData = [
   { id: 'b-4', department: 'Sanitation & Waste Management', allocated: 150, spent: 185, status: 'Overbudget' },
   { id: 'b-5', department: 'Digital Governance & IT', allocated: 90, spent: 25, status: 'Audited Flag' },
   { id: 'b-6', department: 'Water Resources & Sewage', allocated: 220, spent: 210, status: 'On Track' },
+];
+
+const defaultSubDepartmentData = [
+  { id: 'sub-edu-1', departmentName: 'Education & Schools', entityName: 'Western Regional Campus (WRC) Infrastructure', allocated: 110, spent: 108, status: 'On Track' },
+  { id: 'sub-edu-2', departmentName: 'Education & Schools', entityName: 'Eastern Regional Campus (ERC) Research Lab', allocated: 90, spent: 88, status: 'On Track' },
+  { id: 'sub-hlth-1', departmentName: 'Public Health Services', entityName: 'Pokhara Academy of Health Sciences (PAHS)', allocated: 120, spent: 50, status: 'Underutilized' },
+  { id: 'sub-wat-1', departmentName: 'Water Resources & Sewage', entityName: 'Mardi Khola Water Treatment Facility', allocated: 100, spent: 98, status: 'On Track' },
+  { id: 'sub-rd-1', departmentName: 'Roads & Infrastructure', entityName: 'Pokhara Metropolitan Ring Road Expansion', allocated: 90, spent: 45, status: 'On Track' },
+  { id: 'sub-san-1', departmentName: 'Sanitation & Waste Management', entityName: 'Landfill Site Waste Processing Plant', allocated: 80, spent: 100, status: 'Overbudget' },
+  { id: 'sub-it-1', departmentName: 'Digital Governance & IT', entityName: 'Central Data Center & KYC Hub Deployment', allocated: 40, spent: 10, status: 'Audited Flag' }
 ];
 
 const defaultPoliticianData = [
@@ -119,6 +138,19 @@ async function ensureTablesExist() {
         status TEXT NOT NULL
       );
     `;
+    
+    // NEW: Added Sub-department table creation
+    await sql`
+      CREATE TABLE IF NOT EXISTS sub_department_data (
+        id TEXT PRIMARY KEY,
+        department_name TEXT NOT NULL,
+        entity_name TEXT NOT NULL,
+        allocated NUMERIC NOT NULL,
+        spent NUMERIC NOT NULL,
+        status TEXT NOT NULL
+      );
+    `;
+    
     await sql`
       CREATE TABLE IF NOT EXISTS politician_assets (
         id TEXT PRIMARY KEY,
@@ -178,14 +210,24 @@ async function ensureTablesExist() {
       );
     `;
 
-    // Check if budget_categories has data; if empty, hydrate Neon DB tables
+    // Check if budget_categories has data; if empty, hydrate ALL Neon DB tables
     const check = await sql`SELECT COUNT(*) as count FROM budget_categories`;
+    
     if (Number(check[0]?.count || 0) === 0) {
       for (const item of defaultBudgetData) {
         await sql`
           INSERT INTO budget_categories (id, department, allocated, spent, status)
           VALUES (${item.id}, ${item.department}, ${item.allocated}, ${item.spent}, ${item.status})
           ON CONFLICT (department) DO NOTHING;
+        `;
+      }
+
+      // NEW: Added Sub-department table hydration
+      for (const sub of defaultSubDepartmentData) {
+        await sql`
+          INSERT INTO sub_department_data (id, department_name, entity_name, allocated, spent, status)
+          VALUES (${sub.id}, ${sub.departmentName}, ${sub.entityName}, ${sub.allocated}, ${sub.spent}, ${sub.status})
+          ON CONFLICT (id) DO NOTHING;
         `;
       }
 
@@ -242,7 +284,7 @@ async function ensureTablesExist() {
 }
 
 // -------------------------------------------------------------
-// 1. BUDGET CATEGORY ACTIONS (NEON DBMS EXCLUSIVE)
+// 1. BUDGET CATEGORY ACTIONS
 // -------------------------------------------------------------
 export async function getBudgetData(): Promise<BudgetCategory[]> {
   try {
@@ -279,7 +321,7 @@ export async function createBudgetCategory(data: Omit<BudgetCategory, 'id'>) {
 }
 
 // -------------------------------------------------------------
-// 2. POLITICIAN ASSETS ACTIONS (NEON DBMS EXCLUSIVE)
+// 2. POLITICIAN ASSETS ACTIONS
 // -------------------------------------------------------------
 export async function getPoliticianAssets(): Promise<PoliticianAsset[]> {
   try {
@@ -314,7 +356,7 @@ export async function getPoliticianAssets(): Promise<PoliticianAsset[]> {
 }
 
 // -------------------------------------------------------------
-// 3. PROMISE TRACKER ACTIONS (NEON DBMS EXCLUSIVE)
+// 3. PROMISE TRACKER ACTIONS
 // -------------------------------------------------------------
 export async function getPromisesData(): Promise<PromiseItem[]> {
   try {
@@ -340,7 +382,7 @@ export async function getPromisesData(): Promise<PromiseItem[]> {
 }
 
 // -------------------------------------------------------------
-// 4. OFFICIAL KYC REGISTER ACTIONS (NEON DBMS EXCLUSIVE)
+// 4. OFFICIAL KYC REGISTER ACTIONS
 // -------------------------------------------------------------
 export async function getKYCRecords(): Promise<KYCRecord[]> {
   try {
@@ -366,7 +408,7 @@ export async function getKYCRecords(): Promise<KYCRecord[]> {
 }
 
 // -------------------------------------------------------------
-// 5. PUBLIC COMPLAINTS HUB ACTIONS (NEON DBMS EXCLUSIVE)
+// 5. PUBLIC COMPLAINTS HUB ACTIONS
 // -------------------------------------------------------------
 export async function getComplaintsData(): Promise<ComplaintItem[]> {
   try {
@@ -434,7 +476,7 @@ export async function submitComplaint(newComplaint: {
 }
 
 // -------------------------------------------------------------
-// 6. FAQ KNOWLEDGE BASE ACTIONS (NEON DBMS EXCLUSIVE)
+// 6. FAQ KNOWLEDGE BASE ACTIONS
 // -------------------------------------------------------------
 export async function getFAQData(): Promise<FAQItem[]> {
   try {
@@ -455,39 +497,36 @@ export async function getFAQData(): Promise<FAQItem[]> {
   }
 }
 
-export interface SubDepartmentData {
-  id: string;
-  departmentName: string;
-  entityName: string;
-  allocated: number;
-  spent: number;
-  status: string;
-}
-
-// Fetch breakdown sub-entities for a specific department from Neon
+// -------------------------------------------------------------
+// 7. SUB-DEPARTMENT ACTIONS (FIXED FOR NEON SQL)
+// -------------------------------------------------------------
 export async function getSubDepartmentData(departmentName: string): Promise<SubDepartmentData[]> {
   try {
-    const { data, error } = await supabase
-      .from('sub_department_data')
-      .select('*')
-      .eq('department_name', departmentName)
-      .order('allocated', { ascending: false });
+    await ensureTablesExist(); // Ensure the table is ready before querying
+    
+    const rows = await sql`
+      SELECT id, department_name AS "departmentName", entity_name AS "entityName", 
+             allocated::float, spent::float, status
+      FROM sub_department_data
+      WHERE department_name = ${departmentName}
+      ORDER BY allocated DESC
+    `;
 
-    if (!error && data && data.length > 0) {
-      return data.map((item: any) => ({
-        id: item.id,
-        departmentName: item.department_name,
-        entityName: item.entity_name,
-        allocated: Number(item.allocated),
-        spent: Number(item.spent),
-        status: item.status,
+    if (rows && rows.length > 0) {
+      return rows.map((r: any) => ({
+        id: String(r.id),
+        departmentName: String(r.departmentName),
+        entityName: String(r.entityName),
+        allocated: Number(r.allocated),
+        spent: Number(r.spent),
+        status: String(r.status),
       }));
     }
   } catch (err) {
-    console.warn('Fallback sub-department query triggered:', err);
+    console.warn('Neon database query failed, serving fallback:', err);
   }
 
-  // Fallback data structure if offline
+  // Fallback data structure if offline or table is empty
   return [
     {
       id: 'sub-fallback-1',
