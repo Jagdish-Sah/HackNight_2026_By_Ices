@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GovTrace Hub — Master Architectural & Technical System Presentation</title>
+    
+    <!-- Meta SEO & Presentation Info -->
+    <meta name="description" content="GovTrace Hub — College Project Master Presentation on Good Governance, Municipal Financial Auditing & Public Oversight Web Architecture.">
+    <meta name="author" content="Jagdish Sah & Engineering Team">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #070a12;
+            --bg-card: rgba(15, 23, 42, 0.75);
+            --bg-card-hover: rgba(30, 41, 59, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-glow: rgba(16, 185, 129, 0.3);
+            
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-sub: #cbd5e1;
+            
+            --accent-emerald: #10b981;
+            --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+            --accent-amber: #f59e0b;
+            --accent-amber-glow: rgba(245, 158, 11, 0.25);
+            --accent-rose: #f43f5e;
+            --accent-rose-glow: rgba(244, 63, 94, 0.25);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+            --accent-purple: #a855f7;
+            
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --transition-speed: 0.4s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Ambient Animated Canvas Background */
+        #gov-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 20%, #0f172a 0%, #070a12 80%);
+        }
+
+        /* Main Deck Viewport */
+        .presentation-viewport {
+            position: relative;
+            z-index: 10;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Header Navigation & Status Bar */
+        header.deck-header {
+            height: 65px;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(7, 10, 18, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 1.2rem;
+            box-shadow: 0 0 15px var(--accent-emerald-glow);
+        }
+
+        .brand-text h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #ffffff, #a7f3d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text span {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            display: block;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pill-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pill-badge i {
+            color: var(--accent-emerald);
+        }
+
+        .btn-ctrl {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: var(--font-sans);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-ctrl:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent-emerald);
+            color: var(--accent-emerald);
+            transform: translateY(-1px);
+        }
+
+        .btn-ctrl.active {
+            background: var(--accent-emerald);
+            color: #000;
+            border-color: var(--accent-emerald);
+            font-weight: 600;
+        }
+
+        /* Top Progress Line */
+        .progress-bar-container {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            position: absolute;
+            top: 65px;
+            left: 0;
+            z-index: 20;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-emerald), var(--accent-cyan), var(--accent-amber));
+            transition: width 0.3s ease-out;
+            box-shadow: 0 0 10px var(--accent-emerald-glow);
+        }
+
+        /* Main Slide Container Stage */
+        .slides-stage {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 130px);
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 2.5rem 3.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.96) translateY(20px);
+            transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease, visibility var(--transition-speed);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+            z-index: 5;
+        }
+
+        /* Custom Scrollbar for Slides */
+        .slide::-webkit-scrollbar {
+            width: 6px;
+        }
+        .slide::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .slide::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        /* Slide Content Typography & Layout */
+        .slide-header {
+            margin-bottom: 1.8rem;
+        }
+
+        .slide-tag {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-emerald);
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slide-tag i {
+            font-size: 0.75rem;
+        }
+
+        .slide-title {
+            font-family: var(--font-serif);
+            font-size: clamp(1.8rem, 3.5vw, 2.7rem);
+            font-weight: 700;
+            line-height: 1.2;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .slide-subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-weight: 300;
+            max-width: 900px;
+        }
+
+        /* Generic Glass Cards & Grids */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.8rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.2rem;
+        }
+
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(16px);
+            border-radius: 16px;
+            padding: 1.5rem 1.8rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .glass-card.highlight {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(6, 78, 59, 0.3));
+        }
+
+        .glass-card.warning {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(120, 53, 15, 0.3));
+        }
+
+        .glass-card.danger {
+            border-color: rgba(244, 63, 94, 0.4);
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(136, 19, 55, 0.3));
+        }
+
+        .card-header-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-emerald);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-body {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+        }
+
+        .card-body p {
+            margin-bottom: 0.8rem;
+        }
+
+        .card-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .list-styled {
+            list-style: none;
+            margin: 0.8rem 0;
+        }
+
+        .list-styled li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.6rem;
+            font-size: 0.92rem;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        .list-styled li::before {
+            content: "✦";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--accent-emerald);
+            font-size: 0.8rem;
+        }
+
+        /* Stat Counter Boxes */
+        .stat-box {
+            text-align: center;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-emerald);
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Code Blocks & Tables */
+        .code-block {
+            background: #04060a;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: #38bdf8;
+            overflow-x: auto;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .code-block .kw { color: #f472b6; font-weight: 600; }
+        .code-block .fn { color: #38bdf8; }
+        .code-block .str { color: #34d399; }
+        .code-block .cm { color: #64748b; font-style: italic; }
+        .code-block .num { color: #fbbf24; }
+
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        table.data-table th, table.data-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        table.data-table th {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--accent-emerald);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        table.data-table tr:hover td {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .badge-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+
+        .badge-status.on-track { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+        .badge-status.audited { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .badge-status.overbudget { background: rgba(244, 63, 94, 0.2); color: #f87171; border: 1px solid rgba(244, 63, 94, 0.4); }
+
+        /* Interactive Demos in Slides */
+        .demo-box {
+            background: rgba(10, 15, 26, 0.9);
+            border: 1px dashed var(--accent-emerald);
+            border-radius: 14px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .demo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .demo-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent-emerald);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Footer Controls Bar */
+        footer.deck-footer {
+            height: 65px;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(7, 10, 18, 0.85);
+            backdrop-filter: blur(16px);
+            border-top: 1px solid var(--border-color);
+            z-index: 20;
+        }
+
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slide-counter {
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            color: var(--accent-emerald);
+            font-weight: 700;
+        }
+
+        .slide-title-mini {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-left: 1px solid var(--border-color);
+            padding-left: 15px;
+            max-width: 400px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .footer-nav {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-arrow {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-arrow:hover:not(:disabled) {
+            background: var(--accent-emerald);
+            color: #000;
+            box-shadow: 0 0 15px var(--accent-emerald-glow);
+            transform: scale(1.05);
+        }
+
+        .nav-arrow:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Slide Modal Overview Grid */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(5, 8, 15, 0.92);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-header {
+            padding: 1.5rem 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            color: #ffffff;
+        }
+
+        .modal-body {
+            flex: 1;
+            padding: 2rem 3rem;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .thumb-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .thumb-card:hover {
+            border-color: var(--accent-emerald);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+        }
+
+        .thumb-card.active {
+            border-color: var(--accent-emerald);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .thumb-num {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent-emerald);
+            margin-bottom: 0.4rem;
+        }
+
+        .thumb-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.4rem;
+        }
+
+        .thumb-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Title Slide Custom Hero Styles */
+        .title-hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.15));
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent-emerald);
+            margin-bottom: 1.5rem;
+            letter-spacing: 1.5px;
+            box-shadow: 0 0 20px var(--accent-emerald-glow);
+        }
+
+        .title-hero h1 {
+            font-family: var(--font-serif);
+            font-size: clamp(2.5rem, 5vw, 4.2rem);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 1.2rem;
+            background: linear-gradient(180deg, #ffffff 0%, #a7f3d0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .title-hero p {
+            font-size: 1.2rem;
+            color: var(--text-sub);
+            max-width: 800px;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .tech-pill-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 2.5rem;
+        }
+
+        .tech-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-sub);
+        }
+
+        /* Printable PDF Styles */
+        @media print {
+            header.deck-header, footer.deck-footer, .progress-bar-container, #gov-canvas {
+                display: none !important;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                overflow: visible !important;
+            }
+            .slides-stage {
+                height: auto !important;
+                overflow: visible !important;
+            }
+            .slide {
+                position: relative !important;
+                opacity: 1 !important;
+                visibility: visible !important;
+                transform: none !important;
+                page-break-after: always;
+                padding: 2rem !important;
+                color: #000000 !important;
+                background: #ffffff !important;
+            }
+            .glass-card {
+                background: #f8fafc !important;
+                border: 1px solid #cbd5e1 !important;
+                color: #000000 !important;
+                box-shadow: none !important;
+            }
+            .slide-title, .card-title, .title-hero h1 {
+                color: #0f172a !important;
+                -webkit-text-fill-color: initial !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Animated Canvas Background -->
+    <canvas id="gov-canvas"></canvas>
+
+    <div class="presentation-viewport">
+        <!-- Top Navigation Header -->
+        <header class="deck-header">
+            <a href="index.html" class="header-brand" title="Return to Main Anthology Hub">
+                <div class="brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="brand-text">
+                    <h1>GOVTRACE HUB</h1>
+                    <span>College Project • Good Governance System</span>
+                </div>
+            </a>
+
+            <div class="header-controls">
+                <div class="pill-badge" id="current-theme-pill">
+                    <i class="fa-solid fa-server"></i> Neon Serverless PostgreSQL
+                </div>
+                <button class="btn-ctrl" id="btn-grid" onclick="toggleOverviewModal()" title="View All Slides Grid (O)">
+                    <i class="fa-solid fa-grid-2"></i> Overview
+                </button>
+                <button class="btn-ctrl" id="btn-fullscreen" onclick="toggleFullScreen()" title="Fullscreen Mode (F)">
+                    <i class="fa-solid fa-expand"></i> Present
+                </button>
+                <button class="btn-ctrl" id="btn-print" onclick="window.print()" title="Print / Export PDF">
+                    <i class="fa-solid fa-print"></i> PDF
+                </button>
+            </div>
+        </header>
+
+        <!-- Progress Indicator -->
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+
+        <!-- Slides Stage Area -->
+        <main class="slides-stage" id="slides-stage">
+
+            <!-- SLIDE 0: TITLE COVER SLIDE -->
+            <section class="slide active" id="slide-0">
+                <div class="title-hero">
+                    <div class="hero-badge"><i class="fa-solid fa-award"></i> MASTER COLLEGE PROJECT PRESENTATION</div>
+                    <h1>GOVTRACE HUB</h1>
+                    <p>Comprehensive Architectural & Technical System Codebase Presentation for Civic Transparency, Public Auditability & Real-Time Financial Oversight</p>
+                    
+                    <div class="tech-pill-container">
+                        <span class="tech-tag"><i class="fa-brands fa-react" style="color: #61dafb;"></i> Next.js 16.3 (App Router)</span>
+                        <span class="tech-tag"><i class="fa-brands fa-react" style="color: #61dafb;"></i> React 19.2</span>
+                        <span class="tech-tag"><i class="fa-brands fa-js" style="color: #f7df1e;"></i> TypeScript 5</span>
+                        <span class="tech-tag"><i class="fa-solid fa-database" style="color: #00e699;"></i> Neon Serverless PostgreSQL</span>
+                        <span class="tech-tag"><i class="fa-solid fa-layer-group" style="color: #38bdf8;"></i> Prisma ORM 6.3</span>
+                        <span class="tech-tag"><i class="fa-brands fa-css3-alt" style="color: #38bdf8;"></i> Tailwind CSS v4</span>
+                    </div>
+
+                    <div class="grid-3" style="width: 100%; max-width: 850px;">
+                        <div class="stat-box">
+                            <div class="stat-value">3-Level</div>
+                            <div class="stat-label">Audit Engine</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">100%</div>
+                            <div class="stat-label">Server Actions ('use server')</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value">&gt;15%</div>
+                            <div class="stat-label">Markup Flag Trigger</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 1: EXECUTIVE SYSTEM OVERVIEW -->
+            <section class="slide" id="slide-1">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-compass"></i> SECTION 1.0</div>
+                    <h2 class="slide-title">Executive System Overview & Objectives</h2>
+                    <p class="slide-subtitle">Institutional purpose, target user personas, and high-level architectural goals of GovTrace Hub.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="glass-card highlight">
+                        <div class="card-header-icon"><i class="fa-solid fa-bullseye"></i></div>
+                        <h3 class="card-title">Core Platform Objectives</h3>
+                        <div class="card-body">
+                            <p><strong>GovTrace Hub ("govtrace-hub")</strong> is an operational, production-grade civic oversight portal built to transform how public money is tracked and audited.</p>
+                            <ul class="list-styled">
+                                <li><strong>Municipal Budget Monitoring:</strong> Track allocation vs disbursed funds across municipal sectors with real-time execution rates.</li>
+                                <li><strong>Public Official Asset Tracking:</strong> Compare declared assets from 2022 baseline to 2026 current wealth with automated anomaly detection.</li>
+                                <li><strong>Manifesto Promises:</strong> Track political promises with live percentage progress meters and target deadlines.</li>
+                                <li><strong>Crowdsourced Grievances:</strong> Enable citizens to file tickets with upvoting and live status updates.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="card-header-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                        <h3 class="card-title">Key Architectural Highlights</h3>
+                        <div class="card-body">
+                            <ul class="list-styled">
+                                <li><strong>Serverless PostgreSQL Integration:</strong> Queries Neon Cloud PostgreSQL over HTTP/WebSocket via <code>@neondatabase/serverless</code>.</li>
+                                <li><strong>Zero API Boilerplate:</strong> Full integration of Next.js 16 Server Actions (<code>'use server'</code>) for zero-latency server mutations and path revalidation (<code>revalidatePath</code>).</li>
+                                <li><strong>Multi-Level Audit Engine:</strong> 3-level deep drill-down UI (Level 1 Sectors → Level 2 Institutions → Level 3 JSONB Itemized Task Ledgers).</li>
+                                <li><strong>Automated Anomaly Detection:</strong> Built-in warning engines for &gt;15% itemized cost markup and missing unaccounted fund discrepancies.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 2: RECURSIVE DIRECTORY & FILE STRUCTURE MAP -->
+            <section class="slide" id="slide-2">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-folder-tree"></i> SECTION 2.0</div>
+                    <h2 class="slide-title">Recursive Codebase Directory & File Structure Map</h2>
+                    <p class="slide-subtitle">Modular breakdown of 17 core items (11 files and 6 subdirectories) in the target codebase.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="glass-card">
+                        <h3 class="card-title"><i class="fa-solid fa-folder-open" style="color: var(--accent-amber);"></i> Project Directory Map</h3>
+                        <div class="code-block" style="font-size: 0.78rem; max-height: 380px; overflow-y: auto;">
+New/
+├── .gitignore               <span class="cm"># Version control exclusion rules</span>
+├── AGENTS.md                <span class="cm"># Framework breaking change rules</span>
+├── CLAUDE.md                <span class="cm"># Agent reference pointer</span>
+├── Dev.txt                  <span class="cm"># Dev log (MVP Release & Updates 5-7)</span>
+├── README.md                <span class="cm"># Startup & deployment documentation</span>
+├── eslint.config.mjs        <span class="cm"># Next.js flat ESLint configuration</span>
+├── next.config.ts           <span class="cm"># Framework configuration export</span>
+├── package.json             <span class="cm"># Manifest, dependencies & scripts</span>
+├── postcss.config.mjs       <span class="cm"># Tailwind CSS PostCSS plugin setup</span>
+├── tsconfig.json            <span class="cm"># TS compiler with @/* path alias</span>
+│
+├── app/                     <span class="cm"># App Router root directory</span>
+│   ├── globals.css          <span class="cm"># CSS design tokens & Tailwind v4</span>
+│   ├── layout.tsx           <span class="cm"># Root shell with Inter font & Sidebar</span>
+│   ├── page.tsx             <span class="cm"># Executive Home Dashboard</span>
+│   ├── budget/page.tsx      <span class="cm"># 3-level Audit & Budget Portal</span>
+│   ├── financials/page.tsx  <span class="cm"># Public Official Asset & Anomaly Tracker</span>
+│   ├── complaints/page.tsx  <span class="cm"># Citizen Complaints & Upvoting Hub</span>
+│   └── faq/page.tsx         <span class="cm"># Governance FAQ Knowledge Base</span>
+│
+├── components/
+│   └── Sidebar.tsx          <span class="cm"># Persistent dark sidebar shell</span>
+│
+├── lib/
+│   ├── db.ts                <span class="cm"># Neon serverless SQL & Prisma singleton</span>
+│   └── actions.ts           <span class="cm"># Type-safe Next.js Server Actions</span>
+│
+├── prisma/
+│   └── schema.prisma        <span class="cm"># Prisma ORM schema (7 models, 4 enums)</span>
+│
+└── scripts/
+    └── seed.ts              <span class="cm"># Automated DB hydration pipeline</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card highlight">
+                        <h3 class="card-title"><i class="fa-solid fa-cubes"></i> Module Responsibility Breakdown</h3>
+                        <div class="card-body">
+                            <ul class="list-styled">
+                                <li><strong>Root Shell (<code>app/layout.tsx</code>):</strong> Hosts persistent left sidebar (<code>components/Sidebar.tsx</code>) with dark styling and Lucide iconography.</li>
+                                <li><strong>Data Layer (<code>lib/db.ts</code> & <code>lib/actions.ts</code>):</strong> Decouples database connection logic from UI components via Server Actions.</li>
+                                <li><strong>Schema & ORM (<code>prisma/schema.prisma</code>):</strong> Strict declarative database definitions for seamless migration and type safety.</li>
+                                <li><strong>Seeding Engine (<code>scripts/seed.ts</code>):</strong> Automated CLI hydration pipeline for serverless PostgreSQL database tables.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 3: TECH STACK & ENVIRONMENT CONFIGURATION -->
+            <section class="slide" id="slide-3">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-microchip"></i> SECTION 3.0</div>
+                    <h2 class="slide-title">System Dependencies & Runtime Environment</h2>
+                    <p class="slide-subtitle">Core NPM packages, framework versions, development scripts, and environment variable setup.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="glass-card">
+                        <h3 class="card-title"><i class="fa-solid fa-box-open"></i> Production Dependencies</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Package</th>
+                                    <th>Version</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>next</code></td>
+                                    <td>16.3.0</td>
+                                    <td>App Router Web Framework</td>
+                                </tr>
+                                <tr>
+                                    <td><code>react</code> / <code>react-dom</code></td>
+                                    <td>19.2.8</td>
+                                    <td>UI Engine</td>
+                                </tr>
+                                <tr>
+                                    <td><code>@neondatabase/serverless</code></td>
+                                    <td>^0.10.4</td>
+                                    <td>HTTP/WebSocket Serverless SQL</td>
+                                </tr>
+                                <tr>
+                                    <td><code>@prisma/client</code></td>
+                                    <td>^6.3.1</td>
+                                    <td>Database ORM Bindings</td>
+                                </tr>
+                                <tr>
+                                    <td><code>lucide-react</code></td>
+                                    <td>^1.28.0</td>
+                                    <td>Iconography Suite</td>
+                                </tr>
+                                <tr>
+                                    <td><code>recharts</code></td>
+                                    <td>^3.10.1</td>
+                                    <td>Data Visualization Engine</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="glass-card">
+                        <h3 class="card-title"><i class="fa-solid fa-terminal"></i> Operational NPM Scripts</h3>
+                        <div class="code-block mb-3">
+<span class="cm"># Execute development server</span>
+<span class="kw">npm run</span> dev
+
+<span class="cm"># Synchronize Prisma schema to Database</span>
+<span class="kw">npm run</span> db:push
+
+<span class="cm"># Hydrate Database with Seed Data</span>
+<span class="kw">npm run</span> db:seed   <span class="cm"># Invokes tsx scripts/seed.ts</span>
+
+<span class="cm"># Production Build Compilation</span>
+<span class="kw">npm run</span> build
+                        </div>
+
+                        <div class="demo-box">
+                            <div class="demo-title"><i class="fa-solid fa-plug"></i> Environment Configuration (.env.local)</div>
+                            <div class="code-block" style="font-size: 0.78rem;">
+DATABASE_URL="postgresql://***************************neondb?sslmode=require"
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 4: DATABASE ARCHITECTURE & SCHEMA DESIGN -->
+            <section class="slide" id="slide-4">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-database"></i> SECTION 4.0</div>
+                    <h2 class="slide-title">Database Architecture & Prisma Schema Design</h2>
+                    <p class="slide-subtitle">Declarative Prisma schema defining 7 core relational models, 4 domain enums, and dynamic Neon SQL JSONB extensions.</p>
+                </div>
+
+                <div class="grid-3 mb-3">
+                    <div class="glass-card">
+                        <h4 style="color: var(--accent-emerald);" class="mb-2"><i class="fa-solid fa-list-check"></i> Domain Enums</h4>
+                        <ul class="list-styled" style="font-size: 0.82rem;">
+                            <li><code>BudgetStatus</code>: ON_TRACK, UNDERUTILIZED, OVERBUDGET, AUDITED_FLAG</li>
+                            <li><code>PromiseStatus</code>: IN_PROGRESS, COMPLETED, STALLED, NOT_STARTED</li>
+                            <li><code>KYCStatus</code>: VERIFIED, PENDING, FLAGGED</li>
+                            <li><code>ComplaintStatus</code>: OPEN, UNDER_INVESTIGATION, RESOLVED, ESCALATED</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card">
+                        <h4 style="color: var(--accent-amber);" class="mb-2"><i class="fa-solid fa-table"></i> Primary Models</h4>
+                        <ul class="list-styled" style="font-size: 0.82rem;">
+                            <li><code>BudgetCategory</code> (<code>budget_categories</code>)</li>
+                            <li><code>PoliticianAsset</code> (<code>politician_assets</code>)</li>
+                            <li><code>KeyAsset</code> (<code>key_assets</code> - FK to Politician)</li>
+                            <li><code>PromiseItem</code> (<code>promise_items</code>)</li>
+                            <li><code>KYCRecord</code> (<code>kyc_records</code>)</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card">
+                        <h4 style="color: var(--accent-cyan);" class="mb-2"><i class="fa-solid fa-code-branch"></i> Extended Models</h4>
+                        <ul class="list-styled" style="font-size: 0.82rem;">
+                            <li><code>ComplaintItem</code> (<code>complaint_items</code>)</li>
+                            <li><code>FAQItem</code> (<code>faq_items</code>)</li>
+                            <li><code>sub_department_data</code> (Neon SQL Table with JSONB <code>expenditure_breakdown</code> ledger)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="glass-card highlight">
+                    <h3 class="card-title"><i class="fa-solid fa-file-code"></i> Schema Preview (prisma/schema.prisma)</h3>
+                    <div class="code-block" style="font-size: 0.8rem; max-height: 220px; overflow-y: auto;">
+<span class="kw">model</span> <span class="fn">PoliticianAsset</span> {
+  id               <span class="str">String</span>      @id @default(cuid())
+  name             <span class="str">String</span>
+  role             <span class="str">String</span>
+  declaredAssets   <span class="str">Float</span>       @map("declared_assets")
+  year2022Assets   <span class="str">Float</span>       @map("year_2022_assets")
+  year2026Assets   <span class="str">Float</span>       @map("year_2026_assets")
+  flaggedAnomalies <span class="str">Boolean</span>     @default(false) @map("flagged_anomalies")
+  keyAssets        KeyAsset[]
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+
+  @@map("politician_assets")
+}
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 5: DATA ACCESS LAYER & SERVER ACTIONS -->
+            <section class="slide" id="slide-5">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-network-wired"></i> SECTION 5.0</div>
+                    <h2 class="slide-title">Data Access Layer & Next.js Server Actions</h2>
+                    <p class="slide-subtitle">Zero-API boilerplate asynchronous queries and mutations via <code>lib/db.ts</code> and <code>lib/actions.ts</code>.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="glass-card">
+                        <h3 class="card-title"><i class="fa-solid fa-bolt"></i> lib/db.ts Dual Query Runners</h3>
+                        <div class="card-body">
+                            <p>To ensure high performance and prevent connection leaks during Next.js hot module reloading (HMR), <code>lib/db.ts</code> exports two query engines:</p>
+                            <ul class="list-styled">
+                                <li><strong>Neon Serverless Runner (<code>sql</code>):</strong> Direct HTTP/WebSocket SQL execution per request instantiated via <code>neon(process.env.DATABASE_URL!)</code>.</li>
+                                <li><strong>Prisma Singleton (<code>db</code>):</strong> Global singleton instance attached to <code>globalThis.prisma</code> to preserve connection pools.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="glass-card highlight">
+                        <h3 class="card-title"><i class="fa-solid fa-server"></i> Server Actions Catalog (lib/actions.ts)</h3>
+                        <div class="code-block" style="font-size: 0.78rem; max-height: 260px; overflow-y: auto;">
+<span class="kw">'use server'</span>;
+
+<span class="kw">export async function</span> <span class="fn">getBudgetData</span>() { ... }
+<span class="kw">export async function</span> <span class="fn">createBudgetCategory</span>(data) {
+    <span class="cm">// Runs INSERT ON CONFLICT DO UPDATE</span>
+    <span class="fn">revalidatePath</span>(<span class="str">'/budget'</span>);
+    <span class="fn">revalidatePath</span>(<span class="str">'/'</span>);
+}
+<span class="kw">export async function</span> <span class="fn">getPoliticianAssets</span>() { ... }
+<span class="kw">export async function</span> <span class="fn">upvoteComplaint</span>(ticketId) {
+    <span class="cm">// Atomic SQL: UPDATE complaint_items SET upvotes = upvotes + 1</span>
+    <span class="fn">revalidatePath</span>(<span class="str">'/complaints'</span>);
+}
+<span class="kw">export async function</span> <span class="fn">submitComplaint</span>(data) { ... }
+<span class="kw">export async function</span> <span class="fn">getSubDepartmentData</span>(departmentName) { ... }
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 6: DATABASE SEEDING PIPELINE -->
+            <section class="slide" id="slide-6">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-seedling"></i> SECTION 6.0</div>
+                    <h2 class="slide-title">Database Seeding & Hydration Pipeline</h2>
+                    <p class="slide-subtitle">Automated database initialization CLI script (<code>scripts/seed.ts</code>) utilizing SQL DDL and UPSERT queries.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="glass-card">
+                        <h3 class="card-title"><i class="fa-solid fa-gears"></i> Seeding Execution Workflow</h3>
+                        <ol class="list-styled" style="padding-left: 1.2rem;">
+                            <li><strong>DDL Table Creation:</strong> Executes <code>CREATE TABLE IF NOT EXISTS</code> across all 7 database tables.</li>
+                            <li><strong>Idempotent Upsert Logic:</strong> Employs PostgreSQL <code>ON CONFLICT DO UPDATE</code> to overwrite existing mock data seamlessly without duplication errors.</li>
+                            <li><strong>JSONB Embedding:</strong> Hydrates <code>sub_department_data</code> with itemized task lists containing expected baseline prices and actual disbursements.</li>
+                        </ol>
+                    </div>
+
+                    <div class="glass-card highlight">
+                        <h3 class="card-title"><i class="fa-solid fa-chart-pie"></i> Hydrated Production Datasets</h3>
+                        <div class="card-body">
+                            <ul class="list-styled">
+                                <li><strong>6 Municipal Departments:</strong> Roads, Health, Education, Sanitation, IT, Water Resources.</li>
+                                <li><strong>4 Public Official Profiles:</strong> Baseline 2022 vs 2026 assets (e.g. Rajesh Sharma, Sita Adhikari) with declared land, shares, and anomaly flags.</li>
+                                <li><strong>6 Manifesto Promises:</strong> Progress tracking for Smart Traffic, Digital Wards, Solar Lighting.</li>
+                                <li><strong>6 KYC Verification Records:</strong> Identity NID checks and tax clearance dates.</li>
+                                <li><strong>5 Public Complaints:</strong> Hydrated up to 215 citizen upvotes.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 7: EXECUTIVE DASHBOARD MODULE -->
+            <section class="slide" id="slide-7">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-desktop"></i> SECTION 7.2</div>
+                    <h2 class="slide-title">Executive Dashboard Module (app/page.tsx)</h2>
+                    <p class="slide-subtitle">Centralized oversight landing page combining concurrent data fetching and executive KPI summaries.</p>
+                </div>
+
+                <div class="grid-3 mb-3">
+                    <div class="stat-box" style="border-color: var(--accent-emerald);">
+                        <div class="stat-value" style="color: var(--accent-emerald);">$42.8M / $56.0M</div>
+                        <div class="stat-label">Total Treasury Disbursement (76.4%)</div>
+                    </div>
+
+                    <div class="stat-box" style="border-color: var(--accent-rose);">
+                        <div class="stat-value" style="color: var(--accent-rose);">2 Officials</div>
+                        <div class="stat-label">Flagged Asset Anomalies</div>
+                    </div>
+
+                    <div class="stat-box" style="border-color: var(--accent-amber);">
+                        <div class="stat-value" style="color: var(--accent-amber);">5 Active</div>
+                        <div class="stat-label">Citizen Grievance Tickets</div>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <h3 class="card-title"><i class="fa-solid fa-bolt"></i> Technical Execution Mechanics</h3>
+                    <div class="card-body">
+                        <p>The Executive Dashboard is built as a Client Component that invokes <code>Promise.all()</code> to concurrently fetch budget totals, asset anomaly registers, and complaint records during initial render.</p>
+                        <p>Features an active connection badge confirming zero-latency communication with Neon PostgreSQL cloud database.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 8: MULTI-LEVEL AUDIT ENGINE MODULE -->
+            <section class="slide" id="slide-8">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-magnifying-glass-dollar"></i> SECTION 7.3</div>
+                    <h2 class="slide-title">Budget Expenditure & 3-Level Audit Portal</h2>
+                    <p class="slide-subtitle">Granular departmental audit drawer engine capable of detecting &gt;15% itemized markups and unaccounted funds.</p>
+                </div>
+
+                <div class="grid-3 mb-3">
+                    <div class="glass-card">
+                        <h4 style="color: var(--accent-cyan);"><i class="fa-solid fa-layer-group"></i> Level 1: Sector Master</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">Overview of municipal sectors (Roads, Health, Education) showing allocated vs spent funds and status indicators.</p>
+                    </div>
+
+                    <div class="glass-card">
+                        <h4 style="color: var(--accent-amber);"><i class="fa-solid fa-sitemap"></i> Level 2: Sub-Entities</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">Drill-down drawer detailing sub-institutions, regional offices, and specific municipal divisions.</p>
+                    </div>
+
+                    <div class="glass-card highlight">
+                        <h4 style="color: var(--accent-emerald);"><i class="fa-solid fa-receipt"></i> Level 3: Itemized Ledger</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">Granular JSONB task ledger comparing actual vendor payment against market expected baseline prices.</p>
+                    </div>
+                </div>
+
+                <div class="glass-card danger">
+                    <h3 class="card-title"><i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-rose);"></i> Automated Anomaly Detection Triggers</h3>
+                    <div class="grid-2">
+                        <div>
+                            <strong style="color: var(--accent-rose);">1. Overpriced Cost Markup (&gt;15%)</strong>
+                            <p style="font-size: 0.88rem; color: var(--text-sub);">Automatically flags any itemized task where paid cost exceeds expected price by more than 15% with a <code>ShieldAlert</code> tag.</p>
+                        </div>
+                        <div>
+                            <strong style="color: var(--accent-amber);">2. Unaccounted Missing Funds</strong>
+                            <p style="font-size: 0.88rem; color: var(--text-sub);">Calculates sum of itemized ledger tasks and compares against entity claimed expenditure. Flags discrepancies where spent &gt; task sum.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 9: OFFICIAL ASSET DISCLOSURES MODULE -->
+            <section class="slide" id="slide-9">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-user-shield"></i> SECTION 7.4</div>
+                    <h2 class="slide-title">Public Official Asset Disclosures & Anomaly Tracker</h2>
+                    <p class="slide-subtitle">Wealth accumulation audit tracking declared assets from baseline 2022 to 2026 with South Asian NPR formatting.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="glass-card">
+                        <h3 class="card-title"><i class="fa-solid fa-scale-balanced"></i> Asset Growth Tracking Mechanics</h3>
+                        <div class="card-body">
+                            <ul class="list-styled">
+                                <li><strong>Baseline Wealth Comparison:</strong> Stores baseline 2022 assets alongside 2026 declared holdings to calculate net wealth increase percentage.</li>
+                                <li><strong>Automated Anomaly Flagging:</strong> Flags officials whose wealth growth exceeds 100% or lacks declared income source justification.</li>
+                                <li><strong>Itemized Holdings:</strong> Itemizes declared land plots, real estate, gold reserves, stock shares, and foreign currencies.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="glass-card highlight">
+                        <h3 class="card-title"><i class="fa-solid fa-coins"></i> Nepalese Rupee (NPR) Currency Formatter</h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.8rem;">Custom South Asian numbering format (<code>en-IN</code>) implementation for accurate NPR display:</p>
+                        <div class="code-block">
+<span class="kw">export function</span> <span class="fn">formatNPR</span>(amount: <span class="str">number</span>): <span class="str">string</span> {
+    <span class="kw">return new</span> Intl.NumberFormat(<span class="str">'en-IN'</span>, {
+        style: <span class="str">'currency'</span>,
+        currency: <span class="str">'NPR'</span>,
+        maximumFractionDigits: 0
+    }).format(amount);
+}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 10: PUBLIC COMPLAINTS HUB MODULE -->
+            <section class="slide" id="slide-10">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-comments"></i> SECTION 7.5</div>
+                    <h2 class="slide-title">Public Complaints & Grievance Upvoting Hub</h2>
+                    <p class="slide-subtitle">Crowdsourced citizen grievance portal featuring optimistic UI upvoting and automated ticket generation.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="glass-card">
+                        <h3 class="card-title"><i class="fa-solid fa-ticket"></i> Ticket Lifecycle & Mechanics</h3>
+                        <ul class="list-styled">
+                            <li><strong>Ticket ID Generator:</strong> Automatically generates unique ticket codes (e.g. <code>GRV-1001</code>) and primary keys on submission.</li>
+                            <li><strong>Status Pipeline:</strong> Tracks grievance progress through <code>Open</code>, <code>Under Investigation</code>, <code>Resolved</code>, and <code>Escalated</code> states.</li>
+                            <li><strong>Cache Revalidation:</strong> Server Actions invoke <code>revalidatePath('/complaints')</code> to update all connected clients in real-time.</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card highlight">
+                        <h3 class="card-title"><i class="fa-solid fa-thumbs-up"></i> Optimistic Upvoting Engine</h3>
+                        <div class="card-body">
+                            <p>Clicking the <code>ThumbsUp</code> button instantly increments the local upvote counter in component state while simultaneously invoking the <code>upvoteComplaint</code> Server Action in the background.</p>
+                            <div class="demo-box" style="text-align: center;">
+                                <button class="btn-ctrl active" onclick="demoUpvote()" style="margin: 0 auto; padding: 10px 20px;">
+                                    <i class="fa-solid fa-thumbs-up"></i> Upvote Ticket (GRV-1001): <span id="demo-upvote-count">215</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 11: KYC REGISTERS & FAQ KNOWLEDGE BASE -->
+            <section class="slide" id="slide-11">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-id-card"></i> SECTION 7.6</div>
+                    <h2 class="slide-title">KYC Registers & Governance FAQ Knowledge Base</h2>
+                    <p class="slide-subtitle">Official identity verification checks, tax clearance logs, and interactive civic guidelines accordion.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="glass-card">
+                        <h3 class="card-title"><i class="fa-solid fa-user-check"></i> Official KYC Register</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Official Name</th>
+                                    <th>NID Number</th>
+                                    <th>Tax Clearance</th>
+                                    <th>KYC Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Rajesh Sharma</td>
+                                    <td>NID-8849-201</td>
+                                    <td>2025 Clear</td>
+                                    <td><span class="badge-status on-track">Verified</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Bikram Thapa</td>
+                                    <td>NID-9921-404</td>
+                                    <td>2023 Pending</td>
+                                    <td><span class="badge-status audited">Flagged</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="glass-card">
+                        <h3 class="card-title"><i class="fa-solid fa-circle-question"></i> Governance FAQ Accordion</h3>
+                        <div class="card-body">
+                            <p>Interactive accordion module allowing citizens to search and inspect data sourcing policies, audit frequency schedules, and legal framework definitions.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 12: SYSTEM EVOLUTION CHRONOLOGY -->
+            <section class="slide" id="slide-12">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-timeline"></i> SECTION 8.0</div>
+                    <h2 class="slide-title">System Evolution & Transition Chronology (Dev.txt)</h2>
+                    <p class="slide-subtitle">Structured multi-stage development lifecycle tracing the transition from local mock architecture to Neon Serverless DB.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="glass-card">
+                        <h3 class="card-title"><i class="fa-solid fa-code-commit"></i> Evolution Stages</h3>
+                        <ul class="list-styled">
+                            <li><strong>Full MVP Release:</strong> Initialized Next.js App Router, TypeScript, Tailwind CSS v4, Lucide React, and initial dashboard components.</li>
+                            <li><strong>Update 5 — Persistent DB Architecture:</strong> Added Prisma ORM 6.3.1, designed database models, created <code>lib/db.ts</code> singleton, and built <code>scripts/seed.ts</code> CLI hydrator.</li>
+                            <li><strong>Update 6 — Cloud DB Integration:</strong> Configured online Supabase PostgreSQL database connection with PgBouncer connection pooling.</li>
+                            <li><strong>Update 7 — Neon Serverless Migration:</strong> Migrated to <code>@neondatabase/serverless</code> HTTP/WebSocket driver, refactored Server Actions, and added 3-level JSONB audit triggers.</li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card highlight">
+                        <h3 class="card-title"><i class="fa-solid fa-shield-check"></i> Migration Value Matrix</h3>
+                        <div class="card-body">
+                            <p>Migrating to Neon Serverless PostgreSQL eliminated connection pooling bottlenecks during Next.js hot module reloads while unlocking raw SQL JSONB indexing for Level 3 audit performance.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 13: TECHNICAL INSIGHTS & AUDIT SUMMARY -->
+            <section class="slide" id="slide-13">
+                <div class="slide-header">
+                    <div class="slide-tag"><i class="fa-solid fa-clipboard-check"></i> SECTION 9.0</div>
+                    <h2 class="slide-title">Audit & Technical Insights Summary</h2>
+                    <p class="slide-subtitle">Evaluations on codebase modularity, data integrity, user experience, and security compliance.</p>
+                </div>
+
+                <div class="grid-4">
+                    <div class="glass-card highlight">
+                        <div class="card-header-icon"><i class="fa-solid fa-cubes"></i></div>
+                        <h4 class="card-title">1. Modularity</h4>
+                        <p class="card-body" style="font-size: 0.85rem;">Strict separation between schema, serverless queries, server actions, and UI routes.</p>
+                    </div>
+
+                    <div class="glass-card highlight">
+                        <div class="card-header-icon"><i class="fa-solid fa-database"></i></div>
+                        <h4 class="card-title">2. Resilience</h4>
+                        <p class="card-body" style="font-size: 0.85rem;">Direct SQL queries paired with error-catch fallback states prevent UI crashes on query errors.</p>
+                    </div>
+
+                    <div class="glass-card highlight">
+                        <div class="card-header-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                        <h4 class="card-title">3. Performance</h4>
+                        <p class="card-body" style="font-size: 0.85rem;">Server Action revalidation (<code>revalidatePath</code>) ensures instant updates without full page reloads.</p>
+                    </div>
+
+                    <div class="glass-card highlight">
+                        <div class="card-header-icon"><i class="fa-solid fa-lock"></i></div>
+                        <h4 class="card-title">4. Compliance</h4>
+                        <p class="card-body" style="font-size: 0.85rem;">Adheres strictly to Next.js 16 App Router guidelines and React 19 standards.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SLIDE 14: Q&A & DEFENSE SUMMARY -->
+            <section class="slide" id="slide-14">
+                <div class="title-hero">
+                    <div class="hero-badge"><i class="fa-solid fa-check-double"></i> PRESENTATION CONCLUDED</div>
+                    <h1 style="font-size: 3.2rem;">Thank You & Open Q&A</h1>
+                    <p>GovTrace Hub represents a production-ready blueprint for public transparency, empowering citizens through modern web technologies and audited data pipelines.</p>
+                    
+                    <div class="grid-2" style="width: 100%; max-width: 700px; margin-top: 2rem;">
+                        <button class="btn-ctrl active" onclick="goToSlide(0)" style="padding: 14px 24px; font-size: 1rem; justify-content: center;">
+                            <i class="fa-solid fa-rotate-left"></i> Restart Presentation
+                        </button>
+                        <a href="index.html" class="btn-ctrl" style="padding: 14px 24px; font-size: 1rem; justify-content: center; text-decoration: none;">
+                            <i class="fa-solid fa-house"></i> Return to Main Anthology Hub
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer Navigation Controls Bar -->
+        <footer class="deck-footer">
+            <div class="footer-left">
+                <span class="slide-counter" id="slide-counter">SLIDE 01 / 15</span>
+                <span class="slide-title-mini" id="slide-title-mini">Executive System Cover</span>
+            </div>
+
+            <div class="footer-nav">
+                <button class="nav-arrow" id="btn-prev" onclick="prevSlide()" title="Previous Slide (←)"><i class="fa-solid fa-chevron-left"></i></button>
+                <button class="nav-arrow" id="btn-next" onclick="nextSlide()" title="Next Slide (→)"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Slide Overview Grid Modal -->
+    <div class="modal-overlay" id="modal-overview">
+        <div class="modal-header">
+            <h2 class="modal-title"><i class="fa-solid fa-grid-2" style="color: var(--accent-emerald);"></i> Presentation Slide Navigator</h2>
+            <button class="btn-ctrl" onclick="toggleOverviewModal()"><i class="fa-solid fa-xmark"></i> Close</button>
+        </div>
+        <div class="modal-body" id="modal-thumbs-grid">
+            <!-- Dynamically populated via JS -->
+        </div>
+    </div>
+
+    <!-- JavaScript Presentation Controller -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        const slideTitles = [
+            "Executive System Cover",
+            "Executive System Overview & Objectives",
+            "Recursive Codebase Directory & File Structure",
+            "System Dependencies & Runtime Environment",
+            "Database Architecture & Prisma Schema Design",
+            "Data Access Layer & Next.js Server Actions",
+            "Database Seeding & Hydration Pipeline",
+            "Executive Dashboard Module (app/page.tsx)",
+            "Budget Expenditure & 3-Level Audit Portal",
+            "Public Official Asset Disclosures & Anomaly Tracker",
+            "Public Complaints & Grievance Upvoting Hub",
+            "KYC Registers & Governance FAQ Knowledge Base",
+            "System Evolution & Transition Chronology",
+            "Audit & Technical Insights Summary",
+            "Thank You & Open Q&A"
+        ];
+
+        function updateSlideUI() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            // Update Progress fill
+            const progressPercent = (currentSlide / (slides.length - 1)) * 100;
+            document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+
+            // Update Footer text
+            const numStr = String(currentSlide + 1).padStart(2, '0');
+            const totalStr = String(slides.length).padStart(2, '0');
+            document.getElementById('slide-counter').innerText = `SLIDE ${numStr} / ${totalStr}`;
+            document.getElementById('slide-title-mini').innerText = slideTitles[currentSlide] || "";
+
+            // Update Prev/Next buttons
+            document.getElementById('btn-prev').disabled = (currentSlide === 0);
+            document.getElementById('btn-next').disabled = (currentSlide === slides.length - 1);
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < slides.length) {
+                currentSlide = index;
+                updateSlideUI();
+                closeOverviewModal();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlideUI();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlideUI();
+            }
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                prevSlide();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullScreen();
+            } else if (e.key === 'o' || e.key === 'O') {
+                toggleOverviewModal();
+            } else if (e.key === 'Escape') {
+                closeOverviewModal();
+            }
+        });
+
+        // Overview Modal functions
+        function toggleOverviewModal() {
+            const modal = document.getElementById('modal-overview');
+            if (modal.classList.contains('active')) {
+                closeOverviewModal();
+            } else {
+                buildThumbs();
+                modal.classList.add('active');
+            }
+        }
+
+        function closeOverviewModal() {
+            document.getElementById('modal-overview').classList.remove('active');
+        }
+
+        function buildThumbs() {
+            const grid = document.getElementById('modal-thumbs-grid');
+            grid.innerHTML = '';
+            slides.forEach((_, idx) => {
+                const card = document.createElement('div');
+                card.className = `thumb-card ${idx === currentSlide ? 'active' : ''}`;
+                card.onclick = () => goToSlide(idx);
+                card.innerHTML = `
+                    <div class="thumb-num">SLIDE ${String(idx + 1).padStart(2, '0')}</div>
+                    <div class="thumb-title">${slideTitles[idx]}</div>
+                    <div class="thumb-desc">Click to jump directly to this presentation section.</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Fullscreen Toggle
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Demo Interactive Upvote Function
+        let upvoteCount = 215;
+        function demoUpvote() {
+            upvoteCount++;
+            document.getElementById('demo-upvote-count').innerText = upvoteCount;
+        }
+
+        // Canvas Ambient Network Effect
+        const canvas = document.getElementById('gov-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            for (let i = 0; i < 45; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    radius: Math.random() * 2 + 1
+                });
+            }
+        }
+
+        function renderCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(16, 185, 129, 0.4)';
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.08)';
+
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                for (let j = i + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(renderCanvas);
+        }
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas();
+        renderCanvas();
+        updateSlideUI();
+    </script>
+</body>
+</html>
