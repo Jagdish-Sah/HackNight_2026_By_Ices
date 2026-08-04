@@ -1,14 +1,18 @@
 import { neon } from '@neondatabase/serverless';
 import { PrismaClient } from '@prisma/client';
 
-// 1. Neon Serverless PostgreSQL Driver (HTTP direct SQL querying)
-const connectionString =
-  process.env.DATABASE_URL ||
-  'postgresql://neondb_owner:npg_QP68pckzRGIa@ep-late-bird-ayu7650q-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+// Neon Serverless PostgreSQL Driver (HTTP direct SQL querying)
+const connectionString = process.env.DATABASE_URL;
 
-export const sql = neon(connectionString);
+if (!connectionString) {
+  console.warn(
+    '⚠️ DATABASE_URL is not set in environment variables! Please configure DATABASE_URL in .env.local or your Vercel Project Settings.'
+  );
+}
 
-// 2. Prisma Client Singleton (Optimized for connection pooling in HMR)
+export const sql = neon(connectionString || '');
+
+// Prisma Client Singleton
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
@@ -20,4 +24,3 @@ export const db =
   });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
-
