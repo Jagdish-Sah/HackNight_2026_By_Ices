@@ -1,17 +1,57 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { mockBudgetData, mockPoliticianData, mockPromisesData, mockKYCData, mockComplaintsData } from '@/data/mockData';
+import {
+  getBudgetData,
+  getPoliticianAssets,
+  getPromisesData,
+  getKYCRecords,
+  getComplaintsData,
+  BudgetCategory,
+  PoliticianAsset,
+  PromiseItem,
+  KYCRecord,
+  ComplaintItem,
+} from '@/lib/actions';
 import { PieChart, Wallet, ListTodo, ShieldCheck, MessageSquareWarning, ArrowRight, CheckCircle2, AlertTriangle, Building2, TrendingUp } from 'lucide-react';
 
 export default function Home() {
-  const totalAllocated = mockBudgetData.reduce((acc, curr) => acc + curr.allocated, 0);
-  const totalSpent = mockBudgetData.reduce((acc, curr) => acc + curr.spent, 0);
-  const flaggedOfficials = mockPoliticianData.filter((item) => item.flaggedAnomalies).length;
-  const completedPromises = mockPromisesData.filter((item) => item.status === 'Completed').length;
-  const totalPromises = mockPromisesData.length;
-  const openComplaints = mockComplaintsData.filter((item) => item.status === 'Open' || item.status === 'Under Investigation').length;
-  const verifiedKYC = mockKYCData.filter((item) => item.kycStatus === 'Verified').length;
+  const [budget, setBudget] = useState<BudgetCategory[]>([]);
+  const [politicians, setPoliticians] = useState<PoliticianAsset[]>([]);
+  const [promises, setPromises] = useState<PromiseItem[]>([]);
+  const [kyc, setKYC] = useState<KYCRecord[]>([]);
+  const [complaints, setComplaints] = useState<ComplaintItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadAllDashboardMetrics() {
+      try {
+        const [bRes, pRes, prRes, kRes, cRes] = await Promise.all([
+          getBudgetData(),
+          getPoliticianAssets(),
+          getPromisesData(),
+          getKYCRecords(),
+          getComplaintsData(),
+        ]);
+        setBudget(bRes);
+        setPoliticians(pRes);
+        setPromises(prRes);
+        setKYC(kRes);
+        setComplaints(cRes);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadAllDashboardMetrics();
+  }, []);
+
+  const totalAllocated = budget.reduce((acc, curr) => acc + curr.allocated, 0);
+  const totalSpent = budget.reduce((acc, curr) => acc + curr.spent, 0);
+  const flaggedOfficials = politicians.filter((item) => item.flaggedAnomalies).length;
+  const completedPromises = promises.filter((item) => item.status === 'Completed').length;
+  const totalPromises = promises.length;
+  const openComplaints = complaints.filter((item) => item.status === 'Open' || item.status === 'Under Investigation').length;
 
   return (
     <div className="space-y-8">
@@ -20,11 +60,11 @@ export default function Home() {
         <div className="max-w-3xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs font-semibold border border-blue-400/30">
             <ShieldCheck size={14} />
-            GovTrace Hub — Civic Transparency Platform
+            GovTrace Hub — Pure DBMS Connection Active
           </div>
           <h1 className="text-4xl font-extrabold tracking-tight">Executive Governance Dashboard</h1>
           <p className="text-slate-300 text-base leading-relaxed">
-            Real-time public oversight portal monitoring municipal budget execution, official wealth disclosures, manifesto promise completion, KYC compliance, and crowdsourced grievances.
+            Real-time public oversight portal monitoring municipal budget execution, official wealth disclosures, manifesto promise completion, KYC compliance, and crowdsourced grievances directly from the online cloud database.
           </p>
         </div>
       </div>
@@ -34,10 +74,12 @@ export default function Home() {
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Budget Spent / Total</p>
-            <p className="text-2xl font-bold text-slate-900">${totalSpent}M / ${totalAllocated}M</p>
+            <p className="text-2xl font-bold text-slate-900">
+              {loading ? '...' : `$${totalSpent}M / $${totalAllocated}M`}
+            </p>
             <span className="text-xs text-emerald-600 font-semibold flex items-center gap-1 mt-1">
               <TrendingUp size={12} />
-              {((totalSpent / totalAllocated) * 100).toFixed(1)}% execution
+              {totalAllocated > 0 ? ((totalSpent / totalAllocated) * 100).toFixed(1) : 0}% execution
             </span>
           </div>
           <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
@@ -48,10 +90,12 @@ export default function Home() {
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Manifesto Pledges</p>
-            <p className="text-2xl font-bold text-slate-900">{completedPromises} / {totalPromises} Done</p>
+            <p className="text-2xl font-bold text-slate-900">
+              {loading ? '...' : `${completedPromises} / ${totalPromises} Done`}
+            </p>
             <span className="text-xs text-blue-600 font-semibold flex items-center gap-1 mt-1">
               <CheckCircle2 size={12} />
-              {((completedPromises / totalPromises) * 100).toFixed(0)}% completed
+              {totalPromises > 0 ? ((completedPromises / totalPromises) * 100).toFixed(0) : 0}% completed
             </span>
           </div>
           <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
@@ -62,7 +106,9 @@ export default function Home() {
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Flagged Asset Anomalies</p>
-            <p className="text-2xl font-bold text-red-600">{flaggedOfficials} Officials</p>
+            <p className="text-2xl font-bold text-red-600">
+              {loading ? '...' : `${flaggedOfficials} Officials`}
+            </p>
             <span className="text-xs text-red-500 font-medium flex items-center gap-1 mt-1">
               <AlertTriangle size={12} />
               Unexplained growth
@@ -76,7 +122,9 @@ export default function Home() {
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Active Grievances</p>
-            <p className="text-2xl font-bold text-amber-600">{openComplaints} Tickets</p>
+            <p className="text-2xl font-bold text-amber-600">
+              {loading ? '...' : `${openComplaints} Tickets`}
+            </p>
             <span className="text-xs text-slate-500 font-medium flex items-center gap-1 mt-1">
               Pending departmental review
             </span>

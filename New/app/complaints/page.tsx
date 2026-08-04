@@ -1,33 +1,33 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getComplaintsData, upvoteComplaint, submitComplaint, ComplaintItem } from '@/lib/actions';
+import { getComplaintsData, getBudgetData, upvoteComplaint, submitComplaint, ComplaintItem } from '@/lib/actions';
 import { Search, ThumbsUp, PlusCircle, MessageSquareWarning, X, Tag, Calendar, AlertCircle } from 'lucide-react';
-
-const DEPARTMENTS = [
-  'Roads & Infrastructure',
-  'Public Health Services',
-  'Education & Schools',
-  'Sanitation & Waste Management',
-  'Digital Governance & IT',
-  'Water Resources & Sewage',
-];
 
 export default function ComplaintsPage() {
   const [complaints, setComplaints] = useState<ComplaintItem[]>([]);
+  const [departments, setDepartments] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newSubject, setNewSubject] = useState('');
-  const [newDepartment, setNewDepartment] = useState(DEPARTMENTS[0]);
+  const [newDepartment, setNewDepartment] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchComplaints() {
-      const data = await getComplaintsData();
-      setComplaints(data);
+    async function fetchComplaintsAndDepartments() {
+      const [cData, bData] = await Promise.all([
+        getComplaintsData(),
+        getBudgetData(),
+      ]);
+      setComplaints(cData);
+      const depts = bData.map((b) => b.department);
+      setDepartments(depts);
+      if (depts.length > 0) {
+        setNewDepartment(depts[0]);
+      }
       setLoading(false);
     }
-    fetchComplaints();
+    fetchComplaintsAndDepartments();
   }, []);
 
   const handleUpvote = async (id: string) => {
@@ -43,14 +43,16 @@ export default function ComplaintsPage() {
     e.preventDefault();
     if (!newSubject.trim()) return;
 
+    const targetDept = newDepartment || departments[0] || 'General';
+
     const added = await submitComplaint({
       subject: newSubject.trim(),
-      department: newDepartment,
+      department: targetDept,
     });
 
     setComplaints([added, ...complaints]);
     setNewSubject('');
-    setNewDepartment(DEPARTMENTS[0]);
+    setNewDepartment(departments[0] || '');
     setIsModalOpen(false);
   };
 
@@ -192,7 +194,7 @@ export default function ComplaintsPage() {
                   value={newDepartment}
                   onChange={(e) => setNewDepartment(e.target.value)}
                 >
-                  {DEPARTMENTS.map((dept) => (
+                  {departments.map((dept) => (
                     <option key={dept} value={dept}>
                       {dept}
                     </option>

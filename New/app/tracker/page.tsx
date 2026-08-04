@@ -1,22 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { mockPromisesData } from '@/data/mockData';
+import { useState, useEffect } from 'react';
+import { getPromisesData, PromiseItem } from '@/lib/actions';
 import { Search, ListTodo, CheckCircle2, Clock, AlertTriangle, Calendar, Tag, DollarSign } from 'lucide-react';
 
 export default function PromiseTrackerPage() {
+  const [promises, setPromises] = useState<PromiseItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const filteredPromises = mockPromisesData.filter(
+  useEffect(() => {
+    async function fetchData() {
+      const data = await getPromisesData();
+      setPromises(data);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  const filteredPromises = promises.filter(
     (item) =>
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalPledges = mockPromisesData.length;
-  const completedCount = mockPromisesData.filter((item) => item.status === 'Completed').length;
-  const inProgressCount = mockPromisesData.filter((item) => item.status === 'In Progress').length;
-  const stalledCount = mockPromisesData.filter(
+  const totalPledges = promises.length;
+  const completedCount = promises.filter((item) => item.status === 'Completed').length;
+  const inProgressCount = promises.filter((item) => item.status === 'In Progress').length;
+  const stalledCount = promises.filter(
     (item) => item.status === 'Stalled' || item.status === 'Not Started'
   ).length;
 
@@ -26,7 +37,7 @@ export default function PromiseTrackerPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Election Promise Tracker</h1>
-          <p className="text-slate-600">Monitoring manifesto commitments, progress status, and budget allocations</p>
+          <p className="text-slate-600">Monitoring manifesto commitments (Live Neon PostgreSQL Querying)</p>
         </div>
         <div className="relative w-full md:w-72">
           <Search className="absolute left-3 top-3 text-slate-400" size={18} />
@@ -45,7 +56,7 @@ export default function PromiseTrackerPage() {
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Total Pledges</p>
-            <p className="text-2xl font-bold text-slate-900">{totalPledges}</p>
+            <p className="text-2xl font-bold text-slate-900">{loading ? '...' : totalPledges}</p>
           </div>
           <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
             <ListTodo size={24} />
@@ -55,7 +66,7 @@ export default function PromiseTrackerPage() {
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Completed</p>
-            <p className="text-2xl font-bold text-emerald-600">{completedCount}</p>
+            <p className="text-2xl font-bold text-emerald-600">{loading ? '...' : completedCount}</p>
           </div>
           <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
             <CheckCircle2 size={24} />
@@ -65,7 +76,7 @@ export default function PromiseTrackerPage() {
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">In Progress</p>
-            <p className="text-2xl font-bold text-blue-600">{inProgressCount}</p>
+            <p className="text-2xl font-bold text-blue-600">{loading ? '...' : inProgressCount}</p>
           </div>
           <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
             <Clock size={24} />
@@ -75,7 +86,7 @@ export default function PromiseTrackerPage() {
         <div className="p-6 bg-white rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-slate-500">Stalled / Pending</p>
-            <p className="text-2xl font-bold text-amber-600">{stalledCount}</p>
+            <p className="text-2xl font-bold text-amber-600">{loading ? '...' : stalledCount}</p>
           </div>
           <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
             <AlertTriangle size={24} />
@@ -87,76 +98,80 @@ export default function PromiseTrackerPage() {
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
         <h2 className="text-lg font-bold text-slate-900 mb-2">Manifesto Commitments</h2>
         <div className="space-y-4">
-          {filteredPromises.map((item) => {
-            const statusColor =
-              item.status === 'Completed'
-                ? 'bg-emerald-100 text-emerald-700'
-                : item.status === 'In Progress'
-                ? 'bg-blue-100 text-blue-700'
-                : item.status === 'Stalled'
-                ? 'bg-red-100 text-red-700'
-                : 'bg-slate-100 text-slate-700';
+          {loading ? (
+            <div className="py-12 text-center text-slate-500">Connecting to Neon Serverless Database...</div>
+          ) : (
+            filteredPromises.map((item) => {
+              const statusColor =
+                item.status === 'Completed'
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : item.status === 'In Progress'
+                  ? 'bg-blue-100 text-blue-700'
+                  : item.status === 'Stalled'
+                  ? 'bg-red-100 text-red-700'
+                  : 'bg-slate-100 text-slate-700';
 
-            const progressColor =
-              item.progress === 100
-                ? 'bg-emerald-500'
-                : item.progress > 40
-                ? 'bg-blue-500'
-                : item.progress > 0
-                ? 'bg-amber-500'
-                : 'bg-slate-300';
+              const progressColor =
+                item.progress === 100
+                  ? 'bg-emerald-500'
+                  : item.progress > 40
+                  ? 'bg-blue-500'
+                  : item.progress > 0
+                  ? 'bg-amber-500'
+                  : 'bg-slate-300';
 
-            return (
-              <div
-                key={item.id}
-                className="p-5 border border-slate-200 rounded-xl hover:shadow-md transition-shadow space-y-3 bg-slate-50/50"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700 flex items-center gap-1">
-                        <Tag size={12} />
-                        {item.category}
+              return (
+                <div
+                  key={item.id}
+                  className="p-5 border border-slate-200 rounded-xl hover:shadow-md transition-shadow space-y-3 bg-slate-50/50"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700 flex items-center gap-1">
+                          <Tag size={12} />
+                          {item.category}
+                        </span>
+                        <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusColor}`}>
+                          {item.status}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
+                    </div>
+
+                    <div className="flex items-center gap-4 text-xs font-medium text-slate-600">
+                      <span className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-md border border-slate-200">
+                        <DollarSign size={14} className="text-slate-400" />
+                        Budget: {item.budgetAllocated}
                       </span>
-                      <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusColor}`}>
-                        {item.status}
+                      <span className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-md border border-slate-200">
+                        <Calendar size={14} className="text-slate-400" />
+                        Target: {item.targetYear}
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900">{item.title}</h3>
                   </div>
 
-                  <div className="flex items-center gap-4 text-xs font-medium text-slate-600">
-                    <span className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-md border border-slate-200">
-                      <DollarSign size={14} className="text-slate-400" />
-                      Budget: {item.budgetAllocated}
-                    </span>
-                    <span className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-md border border-slate-200">
-                      <Calendar size={14} className="text-slate-400" />
-                      Target: {item.targetYear}
-                    </span>
+                  {/* Visual Progress Bar */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex justify-between text-xs font-semibold text-slate-700">
+                      <span>Completion Progress</span>
+                      <span>{item.progress}%</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
+                        style={{ width: `${item.progress}%` }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
+              );
+            })
+          )}
 
-                {/* Visual Progress Bar */}
-                <div className="space-y-1.5 pt-1">
-                  <div className="flex justify-between text-xs font-semibold text-slate-700">
-                    <span>Completion Progress</span>
-                    <span>{item.progress}%</span>
-                  </div>
-                  <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${progressColor}`}
-                      style={{ width: `${item.progress}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
-          {filteredPromises.length === 0 && (
+          {!loading && filteredPromises.length === 0 && (
             <div className="py-8 text-center text-slate-500">
-              No election promises match your search filter.
+              No election promises found in database.
             </div>
           )}
         </div>

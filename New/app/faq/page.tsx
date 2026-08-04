@@ -1,12 +1,23 @@
 'use client';
 
-import { useState } from 'react';
-import { mockFAQData } from '@/data/mockData';
+import { useState, useEffect } from 'react';
+import { getFAQData, FAQItem } from '@/lib/actions';
 import { Search, ChevronDown, ChevronUp, HelpCircle, BookOpen } from 'lucide-react';
 
 export default function FAQPage() {
+  const [faqs, setFaqs] = useState<FAQItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [openIds, setOpenIds] = useState<string[]>(['1']); // default open first item
+  const [openIds, setOpenIds] = useState<string[]>(['1']);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      const data = await getFAQData();
+      setFaqs(data);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const toggleAccordion = (id: string) => {
     setOpenIds((prev) =>
@@ -14,7 +25,7 @@ export default function FAQPage() {
     );
   };
 
-  const filteredFAQ = mockFAQData.filter(
+  const filteredFAQ = faqs.filter(
     (item) =>
       item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.answer.toLowerCase().includes(searchTerm.toLowerCase())
@@ -26,7 +37,7 @@ export default function FAQPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Governance & Portal FAQ</h1>
-          <p className="text-slate-600">Frequently asked questions about data transparency, tracking, and complaints</p>
+          <p className="text-slate-600">Frequently asked questions (Fetched Live from Neon Database)</p>
         </div>
         <div className="relative w-full md:w-72">
           <Search className="absolute left-3 top-3 text-slate-400" size={18} />
@@ -47,38 +58,44 @@ export default function FAQPage() {
           <span>Knowledge Base & Guidelines</span>
         </div>
 
-        {filteredFAQ.map((item) => {
-          const isOpen = openIds.includes(item.id);
-
-          return (
-            <div key={item.id} className="transition-colors">
-              <button
-                onClick={() => toggleAccordion(item.id)}
-                className="w-full flex items-center justify-between p-5 text-left font-semibold text-slate-900 hover:bg-slate-50 transition-colors focus:outline-none"
-              >
-                <div className="flex items-center gap-3 pr-4">
-                  <HelpCircle className="text-blue-500 shrink-0" size={20} />
-                  <span className="text-base">{item.question}</span>
-                </div>
-                {isOpen ? (
-                  <ChevronUp size={20} className="text-slate-500 shrink-0" />
-                ) : (
-                  <ChevronDown size={20} className="text-slate-500 shrink-0" />
-                )}
-              </button>
-
-              {isOpen && (
-                <div className="px-5 pb-5 pt-1 text-slate-600 text-sm leading-relaxed bg-slate-50/50 border-t border-slate-100">
-                  <p>{item.answer}</p>
-                </div>
-              )}
-            </div>
-          );
-        })}
-
-        {filteredFAQ.length === 0 && (
+        {loading ? (
           <div className="p-8 text-center text-slate-500">
-            No FAQ entries found matching your search.
+            Querying Neon PostgreSQL FAQ Knowledge Base...
+          </div>
+        ) : (
+          filteredFAQ.map((item) => {
+            const isOpen = openIds.includes(item.id);
+
+            return (
+              <div key={item.id} className="transition-colors">
+                <button
+                  onClick={() => toggleAccordion(item.id)}
+                  className="w-full flex items-center justify-between p-5 text-left font-semibold text-slate-900 hover:bg-slate-50 transition-colors focus:outline-none"
+                >
+                  <div className="flex items-center gap-3 pr-4">
+                    <HelpCircle className="text-blue-500 shrink-0" size={20} />
+                    <span className="text-base">{item.question}</span>
+                  </div>
+                  {isOpen ? (
+                    <ChevronUp size={20} className="text-slate-500 shrink-0" />
+                  ) : (
+                    <ChevronDown size={20} className="text-slate-500 shrink-0" />
+                  )}
+                </button>
+
+                {isOpen && (
+                  <div className="px-5 pb-5 pt-1 text-slate-600 text-sm leading-relaxed bg-slate-50/50 border-t border-slate-100">
+                    <p>{item.answer}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+
+        {!loading && filteredFAQ.length === 0 && (
+          <div className="p-8 text-center text-slate-500">
+            No FAQ entries found in database.
           </div>
         )}
       </div>

@@ -1,19 +1,14 @@
 import { neon } from '@neondatabase/serverless';
-import { createClient } from '@supabase/supabase-js';
 import { PrismaClient } from '@prisma/client';
 
 // 1. Neon Serverless PostgreSQL Driver (HTTP direct SQL querying)
-const connectionString = process.env.DATABASE_URL || 'postgres://user:password@localhost:5432/neondb';
+const connectionString =
+  process.env.DATABASE_URL ||
+  'postgresql://neondb_owner:npg_QP68pckzRGIa@ep-late-bird-ayu7650q-pooler.c-5.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+
 export const sql = neon(connectionString);
 
-// 2. Supabase Cloud JS Client (Fallback HTTPS client)
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_key';
-export const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: false },
-});
-
-// 3. Prisma Client Singleton (Optimized for connection pooling in HMR)
+// 2. Prisma Client Singleton (Optimized for connection pooling in HMR)
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
@@ -25,3 +20,4 @@ export const db =
   });
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
+
